@@ -1,0 +1,57 @@
+[CCTVShow]
+Version=1.1.0
+
+[COM]
+Com=3
+PortNo=9600
+
+[ConnectWithServer]
+VideoServID=0x01
+PortNo=4601
+GroupIPAddr=225.1.1.46
+
+[StationName]
+Count=14
+0=Buenos Aires
+1=Dr.A.Sáenz
+2=Villa Soldati
+3=Pte.Illia
+4=Lugano
+5=Villa Madero
+6=M.Fournier
+7=Tapiales
+8=Ing.Castello
+9=Querandí
+10=Laferrere
+11=M.E.Duarte
+12=Independencia
+13=G.Catán
+
+[BroadCastInfo]
+#紧急广播信号信息：编号=紧急广播代码，广播名称
+#紧急广播代码=900+n
+Count=8
+1=900,NO TRABES LAS PUERTAS
+2=901,EMERGENCIA
+3=902,FUELLES
+4=903,ASCENDER
+5=904,DESCENDER
+6=905,LINEA AMARILLA
+7=906,NO TE APOYES EN LAS PUERTAS
+8=907,BICICLETA
+[Language]
+Lan=English
+[UserManage]
+Password=adsl
+[Record]
+Time=480
+JuestTime=110
+[OpenDebugInfor]
+Debug=0
+[CurDate]
+Date=2015-10-30
+[CPURecord]
+IsOpen=1
+[DeleteRHAHour]
+Hour=3
+

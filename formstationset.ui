@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FormStationSet</class>
+ <widget class="QWidget" name="FormStationSet">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>480</width>
+    <height>272</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QGroupBox{
+	color: rgb(255, 255, 255);
+	border-width:3px;
+	border-style:solid;
+	border-color: rgb(9,183,198);
+}
+QCheckBox{
+	color: rgb(60, 60, 60);
+	border:none;
+	background-color: rgb(176, 143, 133);
+}
+QCheckBox::focus{
+	color: rgb(60, 60, 60);
+	border:none;
+	background-color: rgb(208, 230, 255);
+}
+QPushButton{
+	color:rgb(255, 255, 255);
+	border:none;
+	background-color: rgb(95, 95, 95);
+}
+QPushButton::focus{
+	color:rgb(60, 60, 60);
+	border:none;
+	background-color: rgb(208, 230, 255);
+}
+</string>
+  </property>
+  <widget class="QLabel" name="labelBG">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>480</width>
+     <height>272</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>image/BK.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>5</x>
+     <y>5</y>
+     <width>190</width>
+     <height>260</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="title">
+    <string>Station Set</string>
+   </property>
+   <widget class="QListWidget" name="listWidgetStation">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>25</y>
+      <width>180</width>
+      <height>231</height>
+     </rect>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBoxReverse">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>5</y>
+      <width>91</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Reverse</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>203</x>
+     <y>5</y>
+     <width>271</width>
+     <height>260</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Broadcast</string>
+   </property>
+   <widget class="QTableWidget" name="tableWidgetBroadcast">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>25</y>
+      <width>260</width>
+      <height>192</height>
+     </rect>
+    </property>
+    <property name="horizontalScrollBarPolicy">
+     <enum>Qt::ScrollBarAlwaysOff</enum>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::SingleSelection</enum>
+    </property>
+    <property name="selectionBehavior">
+     <enum>QAbstractItemView::SelectRows</enum>
+    </property>
+    <attribute name="horizontalHeaderVisible">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>100</number>
+    </attribute>
+    <attribute name="verticalHeaderVisible">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="verticalHeaderDefaultSectionSize">
+     <number>20</number>
+    </attribute>
+   </widget>
+   <widget class="QPushButton" name="pushButtonStartBro">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>223</y>
+      <width>127</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>StartBro</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonStopBro">
+    <property name="geometry">
+     <rect>
+      <x>135</x>
+      <y>223</y>
+      <width>127</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>StopBro</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
