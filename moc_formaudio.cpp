@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'formaudio.h'
 **
-** Created: Sun Dec 6 16:52:01 2015
+** Created: Mon Dec 7 11:49:54 2015
 **      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
 **
 ** WARNING! All changes made in this file will be lost!

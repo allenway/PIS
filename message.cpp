@@ -15,16 +15,16 @@ Message::Message()
 {
     recvData = new ResData();
     dataHandle = new DataHandle();
-    dataHandle->enable(recvData);
+    //dataHandle->enable(recvData);
     uart = NULL;
     QSettings settings(SYSTEM_CONFIG_PATH, QSettings::IniFormat);
     settings.setIniCodec("UTF-8");
     if(settings.value("Uart/Enable").toBool())
     {
         uart = new UartHandle();
-        uart->enable(settings.value("Uart/Path").toByteArray().constData(),
-                   settings.value("Uart/Baudrate").toInt(),
-                   recvData);
+//        uart->enable(settings.value("Uart/Path").toByteArray().constData(),
+//                   settings.value("Uart/Baudrate").toInt(),
+//                   recvData);
     }
 
 }
@@ -196,6 +196,7 @@ void DataHandle::run()
     QList<QByteArray> packets;
     while(1)
     {
+        qDebug()<<"[RHA]DataHandle run()";
         //等待数据更新
         data->waitUpdate();
         //获取数据包

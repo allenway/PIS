@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     menu->move(0,0);
     menu->hide();
     //添加消息处理中心
-    msgHandle = new Message();
+    //msgHandle = new Message();
     //this->installEventFilter(this);
 
     connect(menu,SIGNAL(stationChanged()),this,SLOT(stationChange()));
@@ -167,7 +167,6 @@ void MainWindow::loadMap()
     //加载地图
     QSettings settings(SYSTEM_CONFIG_PATH, QSettings::IniFormat);
     settings.setIniCodec("UTF-8");
-
     stationsNum = settings.value("StationName/Count").toInt();
     qDebug("Will load %d stations\n",stationsNum);
     isArrive = true;    //初始化为已到站状态
@@ -194,7 +193,7 @@ void MainWindow::loadMap()
     n1 = (stationsNum-n2)/2;
     d1 = (p2.x()-p1.x())/(n1-1);
     d2 = (p4.y()-p2.y())/(n2+1);
-
+    qDebug("func:%s line:%d\n",__func__,__LINE__);
     for(int i=0;i<stationsNum;i++)
     {
         QString str;
@@ -249,6 +248,7 @@ void MainWindow::loadMap()
             this->labelStationName[i].setAlignment(Qt::AlignLeading|Qt::AlignRight|Qt::AlignVCenter);
 
     }
+    qDebug("func:%s line:%d\n",__func__,__LINE__);
     stationChange();
 }
 

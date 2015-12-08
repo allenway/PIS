@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading ui file 'formaudio.ui'
 **
-** Created: Sun Dec 6 16:51:41 2015
+** Created: Mon Dec 7 11:49:35 2015
 **      by: Qt User Interface Compiler version 4.5.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
