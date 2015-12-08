@@ -14,15 +14,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowFlags(Qt::FramelessWindowHint);//去掉标题栏
     //加载站台地图
-    loadMap();
     timerFlash = new QTimer(this);
+    loadMap();
     //初始化菜单节目
     menu = new FormMenu(this);
     menu->move(0,0);
     menu->hide();
     //添加消息处理中心
-    //msgHandle = new Message();
-    //this->installEventFilter(this);
+    msgHandle = new Message();
 
     connect(menu,SIGNAL(stationChanged()),this,SLOT(stationChange()));
     connect(timerFlash,SIGNAL(timeout()),this,SLOT(flashShowStation()));   
@@ -193,7 +192,6 @@ void MainWindow::loadMap()
     n1 = (stationsNum-n2)/2;
     d1 = (p2.x()-p1.x())/(n1-1);
     d2 = (p4.y()-p2.y())/(n2+1);
-    qDebug("func:%s line:%d\n",__func__,__LINE__);
     for(int i=0;i<stationsNum;i++)
     {
         QString str;
@@ -248,7 +246,6 @@ void MainWindow::loadMap()
             this->labelStationName[i].setAlignment(Qt::AlignLeading|Qt::AlignRight|Qt::AlignVCenter);
 
     }
-    qDebug("func:%s line:%d\n",__func__,__LINE__);
     stationChange();
 }
 
@@ -257,7 +254,6 @@ void MainWindow::stationChange()
 {
     QSettings settings(SYSTEM_CONFIG_PATH, QSettings::IniFormat);
     settings.setIniCodec("UTF-8");
-
     //显示列车运行方向
     isReverse = settings.value("StationName/Reverse").toBool();
     if(isReverse)
@@ -268,7 +264,6 @@ void MainWindow::stationChange()
     {
         labelDirection->setGeometry(10,labelStationName[0].y()+labelStationName[0].height(), 60, 10);
     }
-
     //设置车站状态信息（经过、不经过、已经经过）
     QStringList ignorelist;
     QString str;
@@ -488,7 +483,6 @@ void MainWindow::showCurrentStation()
             labelStationPix[oldIndex].setVisible(true);
         oldIndex = -1;
     }
-
 }
 
 //下一车站

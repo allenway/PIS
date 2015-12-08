@@ -20,6 +20,7 @@ private:
     QWaitCondition updateCond;
     bool update;
     QMutex updateLock;
+    QList<QByteArray> packets;
 };
 
 
@@ -33,6 +34,8 @@ public:
     bool enable(ResData *d);
 private:
     ResData *data;
+    bool isMyPacket(const QByteArray & p);    //是发给自己的数据包
+    bool isVaildPacket(const QByteArray &p);  //数据包是否有效
 
 };
 

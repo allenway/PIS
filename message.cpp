@@ -15,16 +15,16 @@ Message::Message()
 {
     recvData = new ResData();
     dataHandle = new DataHandle();
-    //dataHandle->enable(recvData);
+    dataHandle->enable(recvData);
     uart = NULL;
     QSettings settings(SYSTEM_CONFIG_PATH, QSettings::IniFormat);
     settings.setIniCodec("UTF-8");
     if(settings.value("Uart/Enable").toBool())
     {
         uart = new UartHandle();
-//        uart->enable(settings.value("Uart/Path").toByteArray().constData(),
-//                   settings.value("Uart/Baudrate").toInt(),
-//                   recvData);
+        uart->enable(settings.value("Uart/Path").toByteArray().constData(),
+                   settings.value("Uart/Baudrate").toInt(),
+                   recvData);
     }
 
 }
@@ -169,9 +169,18 @@ void UartHandle::run()
         else if(ret==0)
         {
             //qDebug()<<"[RHA]select timeout";
+            for(int i=0;i<10;i++)
+            {
+                for(int j=1;j<30;j++)
+                    buf[j+i*31] = i;
+                buf[0+i*31] = 0x7e;
+                buf[30+i*31] =0x7e;
+            }
+            data->addData(buf,31*10);
         }
         else
         {
+
             qDebug()<<"[RHA][ERROR] select:"<<strerror(errno);
         }
     }
@@ -201,10 +210,29 @@ void DataHandle::run()
         data->waitUpdate();
         //获取数据包
         packets = data->getDataPackets();
+        //qDebug("[RHA]recv %d packets",packets.count());
         //分析数据包
+        for(int i=0;i<packets.count();i++)
+        {
+            isMyPacket(packets.at(i));
+            isVaildPacket(packets.at(i));
+        }
     }
 }
-
+//是发给自己的数据包
+bool DataHandle::isMyPacket(const QByteArray & p)
+{
+    //根据设备号以及车厢号来判断数据包是否是自己的
+    return true;
+}
+//数据包是否有效
+bool DataHandle::isVaildPacket(const QByteArray & p)
+{
+    uchar checksum = 0;
+    for(int i=0;i<p.count()-1;i++)
+        checksum +=(uchar)p.at(i);
+    return (checksum==(uchar)p.at(p.count()-1) ? true:false);
+}
 //ResData
 ResData::ResData()
 {
@@ -224,11 +252,90 @@ void ResData::addData(char *d,int len)
 //从现有数据中提取数据包
 QList<QByteArray> & ResData::getDataPackets()
 {
-    QList<QByteArray> packets;
     dataLock.lock();
+    packets.clear();
+    //数据包以0x7e开始和结尾,所以要丢弃不是0x7e开始的数据
+    //查找到数据头,以0x7e开始
+    while(1)
+    {
+        int i;
+        for(i = 0;i< data.count();i++)
+        {
+            //找到数据头
+            if((uchar)data.at(i)==0x7e)
+            {
+                data.remove(0,i);
+                i = 0;
+                break;
+            }
+        }
+        if(i==data.count()) //没有找到数据头
+        {
+            //清空所以数据
+            data.clear();
+            //跳出循环
+            break;
+        }
+        //查找数据尾，0x7e结尾
+        for(i = 1;i<data.count();i++)
+        {
+            //查找到数据尾
+            if((uchar)data.at(i)==0x7e)
+            {
+                QByteArray packet;
+                uchar t;
+                bool byteError = false;//标识是否有数据转码错误
+                //对数据包进行逆转码
+                //0x7f80->0x7e
+                //0x7f81->0x7f
+                //0x7f后面不是80或81,表示错误
+                for(int j = 1;j<i;j++)
+                {
+                    t = (uchar)data.at(j);
+                    switch(t){
+                    case 0x7f:
+                        //0x7f必须要有两个字节表示才有意义
+                        if((j+1)<i)
+                        {
+                            j++;
+                            t = (uchar)data.at(j);
+                            if(t==0x80)
+                                packet.append(0x7e);
+                            else if(t==0x81)
+                                packet.append(0x7f);
+                            else    //数据是错误的
+                                byteError = true;
+                        }
+                        else  //数据是错误的
+                            byteError = true;
+                            break;
+                    default:
+                        packet.append(t);
+                    }
+                    if(byteError)
+                    {
+                        //qDebug()<<"byteError 0x7f";
+                        break;
+                    }
+                }
+                //数据没有错误，将数据包保存
+                if(!byteError)
+                    packets.append(packet);
+                //清理掉一个数据包,从0x7e到0x7e之间的数据全部清理掉
+                data.remove(0,i+1);
+                i = 0;
+                break;
+            }
+        }
+        if(i==data.count()) //没有找到数据尾
+        {
+            //跳出循环
+            break;
+        }
+    }
     update = false;
-
     dataLock.unlock();
+    //返回有效的数据包
     return packets;
 }
 //等待数据更新，如果数据没有更新，会使调用线程一直出现休眠状态，直到有数据更新
