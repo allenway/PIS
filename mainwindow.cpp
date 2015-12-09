@@ -76,24 +76,31 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e)
         switch(keyEvent->key()){
         case RHA_KEY_START:
             qDebug("KEY_START");
+            this->start();
             return true;
         case RHA_KEY_PA:
             qDebug("KEY_PA");
+            this->pa();
             return true;
         case RHA_KEY_PC:
             qDebug("KEY_PC");
+            this->pc();
             return true;
         case RHA_KEY_CC:
             qDebug("KEY_CC");
+            this->cc();
             return true;
         case RHA_KEY_SP:
             qDebug("KEY_SP");
+            this->sp();
             return true;
         case RHA_KEY_MO:
             qDebug("KEY_MO");
+            this->mo();
             return true;
         case RHA_KEY_PTT:
             qDebug("KEY_PTT");
+            this->ptt(true);
             return true;
         case RHA_KEY_NEXT:
             qDebug("KEY_NEXT");
@@ -139,6 +146,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e)
             return true;
         case RHA_KEY_PTT:
             qDebug("KEY_PTT");
+            this->ptt(false);
             return true;
         case RHA_KEY_NEXT:
             qDebug("KEY_NEXT");
@@ -152,7 +160,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e)
         case RHA_KEY_ARRIVE:
             qDebug("KEY_ARRIVE");
             return true;
-
         }
         return QObject::eventFilter(obj, e);
     }
@@ -593,5 +600,24 @@ void MainWindow::leaveStation()
     //显示当前站台
     showCurrentStation();
 }
-
-
+//启动
+void MainWindow::start()
+{}
+//口播，司机对整列车进行讲话广播
+void MainWindow::pa()
+{}
+//紧急对讲应答，司机对报警进行应答
+void MainWindow::pc()
+{}
+//司机与司机之间进行对讲
+void MainWindow::cc()
+{}
+//音量调节
+void MainWindow::sp()
+{}
+//监听
+void MainWindow::mo()
+{}
+//push to talk，按下时讲话，松开时听话
+void MainWindow::ptt(bool push)
+{}

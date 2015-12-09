@@ -38,12 +38,20 @@ private:
     Message *msgHandle; //消息处理器
 
 
-    void loadMap();     //  车站地图信息加载
+    void loadMap();     //车站地图信息加载
     void showCurrentStation();  //显示当前车站
     void nextStation();         //下一车站
     void prevStation();         //上一车站
     void arriveStation();       //进站
     void leaveStation();        //离站
+    void start();   //启动
+    void pa();      //口播，司机对整列车进行讲话广播
+    void pc();      //紧急对讲应答，司机对报警进行应答
+    void cc();      //司机与司机之间进行对讲
+    void sp();      //音量调节
+    void mo();      //监听
+    void ptt(bool push);     //push to talk，按下时讲话，松开时听话
+
 
 private slots:
     void flashShowStation();      //闪动显示离站状态

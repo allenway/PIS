@@ -168,15 +168,16 @@ void UartHandle::run()
         }
         else if(ret==0)
         {
-            //qDebug()<<"[RHA]select timeout";
-            for(int i=0;i<10;i++)
-            {
-                for(int j=1;j<30;j++)
-                    buf[j+i*31] = i;
-                buf[0+i*31] = 0x7e;
-                buf[30+i*31] =0x7e;
-            }
-            data->addData(buf,31*10);
+//            qDebug()<<"[RHA]select timeout";
+//以下为测试代码
+//            for(int i=0;i<10;i++)
+//            {
+//                for(int j=1;j<30;j++)
+//                    buf[j+i*31] = i;
+//                buf[0+i*31] = 0x7e;
+//                buf[30+i*31] =0x7e;
+//            }
+//            data->addData(buf,31*10);
         }
         else
         {
@@ -211,18 +212,37 @@ void DataHandle::run()
         //获取数据包
         packets = data->getDataPackets();
         //qDebug("[RHA]recv %d packets",packets.count());
-        //分析数据包
-        for(int i=0;i<packets.count();i++)
+        //分析数据包,只分析最新的有效数据包
+        for(int i = packets.count()-1;i>=0;i--)
         {
-            isMyPacket(packets.at(i));
-            isVaildPacket(packets.at(i));
+            const QByteArray & p = packets.at(i);
+            if( isMyPacket(p) && isVaildPacket(p) )
+            {
+                //提取过程数据
+                dataDCP = p.mid(6,DCP_DATA_SIZE);
+                //获取列车状态,第8个字节
+                updateTrainStat();
+                //获取报警器状态,第9到16字节共8个字节
+                updateAnnunciatorStat();
+                //获取故障信息和终点站显示屏状态,第21
+                break; //跳出分析流程
+            }
         }
     }
 }
-//是发给自己的数据包
+//是否发给自己的数据包
 bool DataHandle::isMyPacket(const QByteArray & p)
 {
-    //根据设备号以及车厢号来判断数据包是否是自己的
+    //目的网络ID(1byte)
+    //目的设备ID(1byte)
+    //源网络ID(1byte)
+    //源设备ID(1byte)
+    //数据类型（1byte）
+    //数据长度（1byte）
+    //应用层数据（22bytes)
+    //CRC(1byte)
+    if( p.count()!= DCP_PACKET_SIZE || (uchar)p.at(5)!=DCP_DATA_SIZE )
+        return false;
     return true;
 }
 //数据包是否有效
@@ -233,6 +253,15 @@ bool DataHandle::isVaildPacket(const QByteArray & p)
         checksum +=(uchar)p.at(i);
     return (checksum==(uchar)p.at(p.count()-1) ? true:false);
 }
+
+//获取列车状态,第8个字节
+void DataHandle::updateTrainStat()
+{}
+//获取报警器状态,第9到16字节共8个字节
+void DataHandle::updateAnnunciatorStat()
+{}
+
+
 //ResData
 ResData::ResData()
 {

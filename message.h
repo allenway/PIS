@@ -22,8 +22,10 @@ private:
     QMutex updateLock;
     QList<QByteArray> packets;
 };
-
-
+//DCP过程数据大小
+#define DCP_DATA_SIZE   32
+//DCP数据包大小
+#define DCP_PACKET_SIZE (DCP_DATA_SIZE + 7)
 //DataHandle专门负责处理分析数据包
 class DataHandle:public QThread{
     Q_OBJECT
@@ -33,10 +35,12 @@ public:
     void run();
     bool enable(ResData *d);
 private:
-    ResData *data;
+    ResData *data;  //接收到的原始数据，
+    QByteArray dataDCP; //PIS数据，即广播控制盒与中央控制盒之间的通信数据
     bool isMyPacket(const QByteArray & p);    //是发给自己的数据包
-    bool isVaildPacket(const QByteArray &p);  //数据包是否有效
-
+    bool isVaildPacket(const QByteArray &p);  //数据包是否有效  
+    void updateTrainStat();         //获取列车状态,第8个字节
+    void updateAnnunciatorStat();   //获取报警器状态,第9到16字节共8个字节
 };
 
 //UartHandle专门负责接收和发送Uart原始数据
@@ -50,7 +54,6 @@ public:
 private:
     int fd;
     ResData *data;
-
 };
 
 class Message:public QObject{
