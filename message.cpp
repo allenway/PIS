@@ -26,10 +26,13 @@ Message::Message()
                    settings.value("Uart/Baudrate").toInt(),
                    recvData);
     }
-
+    connect(dataHandle,SIGNAL(ccStatChanged()),this,SIGNAL(ccStatChanged()));
+    connect(dataHandle,SIGNAL(annunciatorStatChanged()),this,SIGNAL(annunciatorStatChanged()));
 }
 Message::~Message()
 {
+    disconnect(dataHandle,SIGNAL(ccStatChanged()),this,SIGNAL(ccStatChanged()));
+    disconnect(dataHandle,SIGNAL(annunciatorStatChanged()),this,SIGNAL(annunciatorStatChanged()));
     if(uart)
         delete uart;
     delete dataHandle;
@@ -189,7 +192,11 @@ void UartHandle::run()
 }
 //DataHandle
 DataHandle::DataHandle()
-{}
+{
+    ccStat = 0;
+    for(int i=0;i<8;i++)
+        annunciatorStat[i] = 0;
+}
 DataHandle::~DataHandle()
 {}
 //启动数据分析线程
@@ -254,18 +261,44 @@ bool DataHandle::isVaildPacket(const QByteArray & p)
     return (checksum==(uchar)p.at(p.count()-1) ? true:false);
 }
 
-//获取列车状态,第8个字节
+//获取列车状态,第8个字节,并作相应的处理
 void DataHandle::updateTrainStat()
-{}
-//获取报警器状态,第9到16字节共8个字节
+{
+    if(dataDCP.count() != DCP_DATA_SIZE)
+        return;
+    uchar d = dataDCP.at(7);
+    //检查司机对讲状态的变化
+    if( d&0x3 != ccStat )
+    {
+        ccStat = d&0x3;
+        //发出状态变化信号
+        emit this->ccStatChanged();
+    }
+
+}
+//获取报警器状态,第9到16字节共8个字节，并作相应的处理
 void DataHandle::updateAnnunciatorStat()
-{}
-
-
+{
+    if(dataDCP.count() != DCP_DATA_SIZE)
+        return;
+    bool changed;
+    for(int i=0;i<8;i++)
+    {
+        uchar d = dataDCP.at(8+i);
+        if( d != annunciatorStat[i] )
+        {
+            annunciatorStat[i] = d;
+            changed = true;
+        }
+    }
+    //如果状态发生了改变，发送状态变化信号
+    if(changed)
+        emit this->annunciatorStatChanged();
+}
 //ResData
 ResData::ResData()
 {
-    update = false;
+    update = false;     //初始化update,表示没有更新
 }
 ResData::~ResData()
 {}

@@ -16,7 +16,9 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 public slots:
-    void stationChange();//车站信息改变，更新UI界面；如运行方向、不经过车站改变
+    void stationUpdate();//车站信息改变，更新UI界面；如运行方向、不经过车站改变
+    void ccStatUpdate();               //司机对讲状态更新UI
+    void annunciatorStatUpdate();      //报警器状态更新UI
 
 protected:
     void changeEvent(QEvent *e);

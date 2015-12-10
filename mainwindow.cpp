@@ -23,14 +23,18 @@ MainWindow::MainWindow(QWidget *parent) :
     //添加消息处理中心
     msgHandle = new Message();
 
-    connect(menu,SIGNAL(stationChanged()),this,SLOT(stationChange()));
-    connect(timerFlash,SIGNAL(timeout()),this,SLOT(flashShowStation()));   
+    connect(menu,SIGNAL(stationChanged()),this,SLOT(stationUpdate()));
+    connect(timerFlash,SIGNAL(timeout()),this,SLOT(flashShowStation()));
+    connect(msgHandle,SIGNAL(ccStatChanged()),this,SLOT(ccStatUpdate()));
+    connect(msgHandle,SIGNAL(annunciatorStatChanged()),this,SLOT(annunciatorStatUpdate()));
 }
 
 MainWindow::~MainWindow()
 {
-    disconnect(menu,SIGNAL(stationChanged()),this,SLOT(stationChange()));
+    disconnect(menu,SIGNAL(stationChanged()),this,SLOT(stationUpdate()));
     disconnect(timerFlash,SIGNAL(timeout()),this,SLOT(flashShowStation()));
+    disconnect(msgHandle,SIGNAL(ccStatChanged()),this,SLOT(ccStatUpdate()));
+    disconnect(msgHandle,SIGNAL(annunciatorStatChanged()),this,SLOT(annunciatorStatUpdate()));
     delete msgHandle;
     delete labelDirection;
     delete labelStationName;
@@ -253,11 +257,11 @@ void MainWindow::loadMap()
             this->labelStationName[i].setAlignment(Qt::AlignLeading|Qt::AlignRight|Qt::AlignVCenter);
 
     }
-    stationChange();
+    stationUpdate();
 }
 
 
-void MainWindow::stationChange()
+void MainWindow::stationUpdate()
 {
     QSettings settings(SYSTEM_CONFIG_PATH, QSettings::IniFormat);
     settings.setIniCodec("UTF-8");
@@ -462,6 +466,12 @@ void MainWindow::stationChange()
     //显示当前站台
     showCurrentStation();
 }
+//司机对讲状态更新
+void MainWindow::ccStatUpdate()
+{}
+//报警器状态更新
+void MainWindow::annunciatorStatUpdate()
+{}
 void MainWindow::flashShowStation()
 {
     static bool ok = true;

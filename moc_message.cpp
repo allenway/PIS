@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'message.h'
 **
-** Created: Wed Dec 9 19:26:23 2015
+** Created: Thu Dec 10 16:54:50 2015
 **      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,16 +23,21 @@ static const uint qt_meta_data_DataHandle[] = {
        2,       // revision
        0,       // classname
        0,    0, // classinfo
-       0,    0, // methods
+       2,   12, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
+
+ // signals: signature, parameters, type, tag, flags
+      12,   11,   11,   11, 0x05,
+      28,   11,   11,   11, 0x05,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_DataHandle[] = {
-    "DataHandle\0"
+    "DataHandle\0\0ccStatChanged()\0"
+    "annunciatorStatChanged()\0"
 };
 
 const QMetaObject DataHandle::staticMetaObject = {
@@ -58,7 +63,27 @@ int DataHandle::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     _id = QThread::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: ccStatChanged(); break;
+        case 1: annunciatorStatChanged(); break;
+        default: ;
+        }
+        _id -= 2;
+    }
     return _id;
+}
+
+// SIGNAL 0
+void DataHandle::ccStatChanged()
+{
+    QMetaObject::activate(this, &staticMetaObject, 0, 0);
+}
+
+// SIGNAL 1
+void DataHandle::annunciatorStatChanged()
+{
+    QMetaObject::activate(this, &staticMetaObject, 1, 0);
 }
 static const uint qt_meta_data_UartHandle[] = {
 
@@ -109,16 +134,21 @@ static const uint qt_meta_data_Message[] = {
        2,       // revision
        0,       // classname
        0,    0, // classinfo
-       0,    0, // methods
+       2,   12, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
+
+ // signals: signature, parameters, type, tag, flags
+       9,    8,    8,    8, 0x05,
+      25,    8,    8,    8, 0x05,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_Message[] = {
-    "Message\0"
+    "Message\0\0ccStatChanged()\0"
+    "annunciatorStatChanged()\0"
 };
 
 const QMetaObject Message::staticMetaObject = {
@@ -144,6 +174,26 @@ int Message::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     _id = QObject::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: ccStatChanged(); break;
+        case 1: annunciatorStatChanged(); break;
+        default: ;
+        }
+        _id -= 2;
+    }
     return _id;
+}
+
+// SIGNAL 0
+void Message::ccStatChanged()
+{
+    QMetaObject::activate(this, &staticMetaObject, 0, 0);
+}
+
+// SIGNAL 1
+void Message::annunciatorStatChanged()
+{
+    QMetaObject::activate(this, &staticMetaObject, 1, 0);
 }
 QT_END_MOC_NAMESPACE
