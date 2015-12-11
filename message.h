@@ -54,6 +54,10 @@ private:
     bool isVaildPacket(const QByteArray &p);  //数据包是否有效  
     void updateTrainStat();         //获取列车状态,第8个字节
     void updateAnnunciatorStat();   //获取报警器状态,第9到16字节共8个字节
+    void setBellStat(bool enable);  //开启关闭振铃
+    void setLEDStat(int num,bool enable);   //开启关闭指定LED灯
+    void setVolume();       //设置音量
+    void setCSLoadStat(bool enable);
 };
 
 //UartHandle专门负责接收和发送Uart原始数据
@@ -73,7 +77,7 @@ class Message:public QObject{
     Q_OBJECT
 public:
     Message();
-    ~Message();   
+    ~Message();
 signals:
     void ccStatChanged();               //司机对讲状态发送变化
     void annunciatorStatChanged();      //报警器状态发生变化

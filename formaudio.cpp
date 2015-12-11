@@ -15,11 +15,13 @@ FormAudio::FormAudio(QWidget *parent) :
     buttonList.append(ui->pushButtonNext);
     buttonListIndex = 0;
     buttonList.at(buttonListIndex)->setFocus();
+    mplayerProcess = new QProcess();
     loadMusicFile();
 }
 
 FormAudio::~FormAudio()
 {
+    delete mplayerProcess;
     delete ui;
 }
 
@@ -85,11 +87,41 @@ void FormAudio::loadMusicFile()
 void FormAudio::on_pushButtonPlay_clicked()
 {
 
+    QString path;
+    QString cmd;
+    path = MUSIC_DIR;
+    path += "/";
+    path +=ui->listWidget->currentItem()->text();
+    if(!QFile::exists(path))
+    {
+        ui->listWidget->removeItemWidget(ui->listWidget->currentItem());
+        return;
+    }
+
+    if(mplayerProcess->pid()!=0)
+    {
+        cmd  = "load " +  path + "\n";
+        mplayerProcess->write(cmd.toUtf8());
+    }
+    else
+    {
+        //启动mplayer程序
+        //-ao alsa 采用alsa声卡驱动
+        //-srate 44100 指定输出采样率为44100，否则有写音乐播放出现稀奇古怪的声音
+        //-slave 指定为从机模式
+        //-quiet 指定信息输出模式为quiet
+        cmd = "mplayer -ao alsa -srate 44100 -slave -quiet " + path;
+        //使用arguments参数时，无法启动，故将参数与命令写成一行
+        mplayerProcess->start(cmd);
+        mplayerProcess->waitForStarted(50);
+    }
 }
 
 void FormAudio::on_pushButtonStop_clicked()
 {
-
+    //退出mplayer程序
+    mplayerProcess->write("quit\n");
+    mplayerProcess->waitForFinished(50);
 }
 
 void FormAudio::on_pushButtonPrev_clicked()
@@ -109,9 +141,7 @@ void FormAudio::on_pushButtonNext_clicked()
     sum = ui->listWidget->count();
     if(sum<=0)
         return;
-
     index = ui->listWidget->currentRow();
     index<sum-1? index++:index = 0;
     ui->listWidget->setCurrentRow(index);
-    qDebug()<<"sum:"<<sum<<"index:"<<index;
 }

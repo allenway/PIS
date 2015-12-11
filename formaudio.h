@@ -5,6 +5,8 @@
 #include <QList>
 #include <QPushButton>
 #include <QDir>
+#include <QProcess>
+#include <QStringList>
 
 #define MUSIC_DIR   "./mp3"
 
@@ -25,6 +27,7 @@ protected:
 private:
     Ui::FormAudio *ui;
     QList<QPushButton *> buttonList;
+    QProcess *mplayerProcess;    //Audio 播放处理进程
     int buttonListIndex;
     void loadMusicFile();
 

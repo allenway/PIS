@@ -274,7 +274,6 @@ void DataHandle::updateTrainStat()
         //发出状态变化信号
         emit this->ccStatChanged();
     }
-
 }
 //获取报警器状态,第9到16字节共8个字节，并作相应的处理
 void DataHandle::updateAnnunciatorStat()
