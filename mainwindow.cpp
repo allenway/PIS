@@ -612,22 +612,36 @@ void MainWindow::leaveStation()
 }
 //启动
 void MainWindow::start()
-{}
+{
+    msgHandle->start();
+}
 //口播，司机对整列车进行讲话广播
 void MainWindow::pa()
-{}
+{
+    msgHandle->pa();
+}
 //紧急对讲应答，司机对报警进行应答
 void MainWindow::pc()
-{}
+{
+    msgHandle->pc();
+}
 //司机与司机之间进行对讲
 void MainWindow::cc()
-{}
+{
+    msgHandle->cc();
+}
 //音量调节
 void MainWindow::sp()
-{}
+{
+    msgHandle->sp();
+}
 //监听
 void MainWindow::mo()
-{}
+{
+    msgHandle->mo();
+}
 //push to talk，按下时讲话，松开时听话
 void MainWindow::ptt(bool push)
-{}
+{
+    msgHandle->ptt(push);
+}

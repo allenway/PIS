@@ -13,9 +13,6 @@
 
 Message::Message()
 {
-    recvData = new ResData();
-    dataHandle = new DataHandle();
-    dataHandle->enable(recvData);
     uart = NULL;
     QSettings settings(SYSTEM_CONFIG_PATH, QSettings::IniFormat);
     settings.setIniCodec("UTF-8");
@@ -23,8 +20,12 @@ Message::Message()
     {
         uart = new UartHandle();
         uart->enable(settings.value("Uart/Path").toByteArray().constData(),
-                   settings.value("Uart/Baudrate").toInt(),
-                   recvData);
+                   settings.value("Uart/Baudrate").toInt());
+    }
+    if(uart!=NULL)
+    {
+        dataHandle = new DataHandle();
+        dataHandle->enable(uart);
     }
     connect(dataHandle,SIGNAL(ccStatChanged()),this,SIGNAL(ccStatChanged()));
     connect(dataHandle,SIGNAL(annunciatorStatChanged()),this,SIGNAL(annunciatorStatChanged()));
@@ -36,24 +37,62 @@ Message::~Message()
     if(uart)
         delete uart;
     delete dataHandle;
-    delete recvData;
 }
+//启动
+void Message::start()
+{
+    dataHandle->start();
+}
+//口播，司机对整列车进行讲话广播
+void Message::pa()
+{
+    dataHandle->pa();
+}
+//紧急对讲应答，司机对报警进行应答
+void Message::pc()
+{
+    dataHandle->pc();
+}
+//司机与司机之间进行对讲
+void Message::cc()
+{
+    dataHandle->cc();
+}
+//音量调节
+void Message::sp()
+{
+    dataHandle->sp();
+}
+//监听
+void Message::mo()
+{
+    dataHandle->mo();
+}
+//push to talk，按下时讲话，松开时听话
+void Message::ptt(bool push)
+{
+    dataHandle->ptt(push);
+}
+
 //UartHanle
 UartHandle::UartHandle()
 {
     fd = -1;
+    data = new ResData();
 }
 UartHandle::~UartHandle()
 {
+    if(data!=NULL)
+        delete data;
     if(fd >=0 )
         close(fd);
 }
-
-bool UartHandle::enable(const char *path,int baudrate,ResData *d)
+ResData *UartHandle::getResData()
 {
-    data = d;
-    if(data==NULL)
-        return false;
+    return data;
+}
+bool UartHandle::enable(const char *path,int baudrate)
+{
     fd = open(path, O_RDWR | O_NOCTTY );
     if(fd<0)
     {
@@ -165,44 +204,67 @@ void UartHandle::run()
             else
             {
                 data->addData(buf,len);  //保存数据
-                //qDebug("[RHA]receive %d byte:%s\n",len,data);
+                QThread::msleep(20);
+                //qDebug("[RHA]receive %d byte\n",len);
                 //write(fd,data,sprintf(data,"[RHA]receive %d byte",len));
             }
         }
         else if(ret==0)
         {
-//            qDebug()<<"[RHA]select timeout";
-//以下为测试代码
-//            for(int i=0;i<10;i++)
-//            {
-//                for(int j=1;j<30;j++)
-//                    buf[j+i*31] = i;
-//                buf[0+i*31] = 0x7e;
-//                buf[30+i*31] =0x7e;
-//            }
-//            data->addData(buf,31*10);
+            //qDebug()<<"[RHA]select timeout";
         }
         else
         {
-
             qDebug()<<"[RHA][ERROR] select:"<<strerror(errno);
         }
     }
     qDebug()<<"[RHA][ERROR] UartHandle::run() exit";
 }
+void UartHandle::sendData(const QByteArray & dat)
+{
+    QByteArray p;
+    uchar d;
+    p.append(0x7e);
+
+    for(int i = 0;i<dat.count();i++)
+    {
+        d = (uchar)dat.at(i);
+        switch(d){
+        case 0x7e:
+            p.append(0x7f);
+            p.append(0x80);
+            break;
+        case 0x7f:
+            p.append(0x7f);
+            p.append(0x81);
+            break;
+        default:
+            p.append(d);
+        }
+    }
+    p.append(0x7e);
+    writeLock.lock();
+    write(fd,p.constData(),p.count());
+    writeLock.unlock();
+}
+
 //DataHandle
 DataHandle::DataHandle()
 {
     ccStat = 0;
     for(int i=0;i<8;i++)
         annunciatorStat[i] = 0;
+    uart = NULL;
 }
 DataHandle::~DataHandle()
 {}
 //启动数据分析线程
-bool DataHandle::enable(ResData *d)
+bool DataHandle::enable(UartHandle *handle)
 {
-    data = d;
+    uart = handle;
+    if(handle==NULL)
+        return false;
+    data = handle->getResData();
     if(data==NULL)
         return false;
     this->start();
@@ -213,7 +275,7 @@ void DataHandle::run()
     QList<QByteArray> packets;
     while(1)
     {
-        qDebug()<<"[RHA]DataHandle run()";
+        //qDebug()<<"[RHA]DataHandle run()";
         //等待数据更新
         data->waitUpdate();
         //获取数据包
@@ -223,10 +285,23 @@ void DataHandle::run()
         for(int i = packets.count()-1;i>=0;i--)
         {
             const QByteArray & p = packets.at(i);
+//            qDebug("packet:");
+//            for(int j=0;j<p.count();j++)
+//            {
+//                qDebug("0x%x",(uchar)p.at(j));
+//            }
+//            qDebug("End packet\n");
+//            uart->sendData(p);
             if( isMyPacket(p) && isVaildPacket(p) )
             {
                 //提取过程数据
                 dataDCP = p.mid(6,DCP_DATA_SIZE);
+//                qDebug("dcp:");
+//                for(int j=0;j<dataDCP.count();j++)
+//                {
+//                    qDebug("0x%x",(uchar)dataDCP.at(j));
+//                }
+//                qDebug("End dcp\n");
                 //获取列车状态,第8个字节
                 updateTrainStat();
                 //获取报警器状态,第9到16字节共8个字节
@@ -258,21 +333,48 @@ bool DataHandle::isVaildPacket(const QByteArray & p)
     uchar checksum = 0;
     for(int i=0;i<p.count()-1;i++)
         checksum +=(uchar)p.at(i);
+    checksum = 0x55 -checksum;
     return (checksum==(uchar)p.at(p.count()-1) ? true:false);
 }
-
+void DataHandle::sendData()
+{
+    QByteArray p;
+    QByteArray dcp;
+    uchar sum = 0;
+    //目的车厢号
+    p.append(0x01);
+    //目的设备号
+    p.append(0x01);
+    //源车厢号
+    p.append((char)0x0);
+    //源设备号
+    p.append((char)0x0);
+    //CMD
+    p.append((char)0x0);
+    //应用层数据长度
+    p.append(22);  //22个字节
+    //应用层数据内容
+    dcp = dataDCP;
+   p.append(dcp);
+    //校验和
+   for(int i = 0;i<p.count();i++)
+       sum+=(uchar)p.at(i);
+   p.append(sum);
+   uart->sendData(p);
+}
 //获取列车状态,第8个字节,并作相应的处理
 void DataHandle::updateTrainStat()
 {
     if(dataDCP.count() != DCP_DATA_SIZE)
         return;
-    uchar d = dataDCP.at(7);
+    uchar d = dataDCP.at(7); 
     //检查司机对讲状态的变化
     if( d&0x3 != ccStat )
     {
         ccStat = d&0x3;
         //发出状态变化信号
         emit this->ccStatChanged();
+        setLEDStat(LED_CC,d&0x3);
     }
 }
 //获取报警器状态,第9到16字节共8个字节，并作相应的处理
@@ -280,7 +382,9 @@ void DataHandle::updateAnnunciatorStat()
 {
     if(dataDCP.count() != DCP_DATA_SIZE)
         return;
-    bool changed;
+    bool have,changed;
+    have = false;
+    changed = false;
     for(int i=0;i<8;i++)
     {
         uchar d = dataDCP.at(8+i);
@@ -292,8 +396,70 @@ void DataHandle::updateAnnunciatorStat()
     }
     //如果状态发生了改变，发送状态变化信号
     if(changed)
+    {
         emit this->annunciatorStatChanged();
+        setBellStat(have);
+        setLEDStat(LED_ANNUNCIATOR,have);
+    }
 }
+//开启关闭振铃
+void DataHandle::setBellStat(bool enable)
+{}
+//开启关闭指定LED灯
+void DataHandle::setLEDStat(int num,bool enable)
+{}
+//设置音量
+void DataHandle::setVolume()
+{}
+//声音使能
+void DataHandle::setCSLoadStat(bool enable)
+{}
+//音量调节
+void DataHandle::sp()
+{
+
+}
+//push to talk，按下时讲话，松开时听话
+void DataHandle::ptt(bool push)
+{
+    setCSLoadStat(push);
+}
+//启动
+void DataHandle::start()
+{
+     sendData();
+}
+//口播，司机对整列车进行讲话广播
+void DataHandle::pa()
+{
+    paStat ^= 0x1;
+    sendData();
+}
+//紧急对讲应答，司机对报警进行应答
+void DataHandle::pc()
+{
+     sendData();
+}
+//司机与司机之间进行对讲
+void DataHandle::cc()
+{
+    switch(ccStat&0x3){
+    case 0:
+        break;
+    case 1:
+        break;
+    case 2:
+        break;
+    }
+    sendData();
+}
+//监听
+void DataHandle::mo()
+{
+     sendData();
+}
+
+
 //ResData
 ResData::ResData()
 {
@@ -381,9 +547,20 @@ QList<QByteArray> & ResData::getDataPackets()
                 }
                 //数据没有错误，将数据包保存
                 if(!byteError)
-                    packets.append(packet);
-                //清理掉一个数据包,从0x7e到0x7e之间的数据全部清理掉
-                data.remove(0,i+1);
+                {
+                    //如果数据的长度为0，说明数据头位置检测不对，需要修正数据头的位置，故只去除一个0x7e
+                    if(packet.count()==0)
+                    {
+                       data.remove(0,1); //清理掉一个0x7e
+                    }
+                    else
+                    {
+                        packets.append(packet);
+                        data.remove(0,i+1); //清理掉一个数据包,从0x7e到0x7e之间的数据全部清理掉
+                    }
+                }
+                else
+                    data.remove(0,i+1); //清理掉一个数据包,从0x7e到0x7e之间的数据全部清理掉
                 i = 0;
                 break;
             }

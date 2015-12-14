@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'message.h'
 **
-** Created: Fri Dec 11 15:04:24 2015
+** Created: Mon Dec 14 20:09:08 2015
 **      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -17,6 +17,49 @@
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
+static const uint qt_meta_data_UartHandle[] = {
+
+ // content:
+       2,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       0,    0, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+       0,    0, // constructors
+
+       0        // eod
+};
+
+static const char qt_meta_stringdata_UartHandle[] = {
+    "UartHandle\0"
+};
+
+const QMetaObject UartHandle::staticMetaObject = {
+    { &QThread::staticMetaObject, qt_meta_stringdata_UartHandle,
+      qt_meta_data_UartHandle, 0 }
+};
+
+const QMetaObject *UartHandle::metaObject() const
+{
+    return &staticMetaObject;
+}
+
+void *UartHandle::qt_metacast(const char *_clname)
+{
+    if (!_clname) return 0;
+    if (!strcmp(_clname, qt_meta_stringdata_UartHandle))
+        return static_cast<void*>(const_cast< UartHandle*>(this));
+    return QThread::qt_metacast(_clname);
+}
+
+int UartHandle::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QThread::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    return _id;
+}
 static const uint qt_meta_data_DataHandle[] = {
 
  // content:
@@ -84,49 +127,6 @@ void DataHandle::ccStatChanged()
 void DataHandle::annunciatorStatChanged()
 {
     QMetaObject::activate(this, &staticMetaObject, 1, 0);
-}
-static const uint qt_meta_data_UartHandle[] = {
-
- // content:
-       2,       // revision
-       0,       // classname
-       0,    0, // classinfo
-       0,    0, // methods
-       0,    0, // properties
-       0,    0, // enums/sets
-       0,    0, // constructors
-
-       0        // eod
-};
-
-static const char qt_meta_stringdata_UartHandle[] = {
-    "UartHandle\0"
-};
-
-const QMetaObject UartHandle::staticMetaObject = {
-    { &QThread::staticMetaObject, qt_meta_stringdata_UartHandle,
-      qt_meta_data_UartHandle, 0 }
-};
-
-const QMetaObject *UartHandle::metaObject() const
-{
-    return &staticMetaObject;
-}
-
-void *UartHandle::qt_metacast(const char *_clname)
-{
-    if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_UartHandle))
-        return static_cast<void*>(const_cast< UartHandle*>(this));
-    return QThread::qt_metacast(_clname);
-}
-
-int UartHandle::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
-{
-    _id = QThread::qt_metacall(_c, _id, _a);
-    if (_id < 0)
-        return _id;
-    return _id;
 }
 static const uint qt_meta_data_Message[] = {
 

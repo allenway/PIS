@@ -24,5 +24,7 @@
 #define RHA_KEY_UP       Qt::Key_X
 #define RHA_KEY_DN       Qt::Key_C
 #define RHA_KEY_BACK     Qt::Key_V
-
+//led num
+#define LED_ANNUNCIATOR    1
+#define LED_CC             2
 #endif // RHA_H

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading ui file 'formstationset.ui'
 **
-** Created: Fri Dec 11 15:04:04 2015
+** Created: Mon Dec 14 15:36:05 2015
 **      by: Qt User Interface Compiler version 4.5.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
