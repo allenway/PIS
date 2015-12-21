@@ -17,8 +17,8 @@ public:
     ~MainWindow();
 public slots:
     void stationUpdate();//车站信息改变，更新UI界面；如运行方向、不经过车站改变
-    void ccStatUpdate();               //司机对讲状态更新UI
-    void annunciatorStatUpdate();      //报警器状态更新UI
+    //void ccStatUpdate();               //司机对讲状态更新UI
+    //void annunciatorStatUpdate();      //报警器状态更新UI
 
 protected:
     void changeEvent(QEvent *e);
@@ -31,7 +31,10 @@ private:
     QLabel *labelStationName;       //站台名字
     QLabel *labelStationPix;        //站台图标
     QLabel *labelDirection;         //行驶方向
+    int firstStationIndex;               //起始站台索引号
+    int lastStationIndex;                //终点站台索引号
     int currentStationIndex;        //当前站台索引号
+    int nextStationIndex;           //下一站台索引号
     bool isArrive;                  //是否到站
     bool isReverse;                 //是否反向
     QTimer *timerFlash;              //闪动显示离站状态定时器

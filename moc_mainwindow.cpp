@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'mainwindow.h'
 **
-** Created: Mon Dec 14 20:09:07 2015
+** Created: Mon Dec 21 20:40:55 2015
 **      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,23 +23,21 @@ static const uint qt_meta_data_MainWindow[] = {
        2,       // revision
        0,       // classname
        0,    0, // classinfo
-       4,   12, // methods
+       2,   12, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
 
  // slots: signature, parameters, type, tag, flags
       12,   11,   11,   11, 0x0a,
-      28,   11,   11,   11, 0x0a,
-      43,   11,   11,   11, 0x0a,
-      67,   11,   11,   11, 0x08,
+      28,   11,   11,   11, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_MainWindow[] = {
-    "MainWindow\0\0stationUpdate()\0ccStatUpdate()\0"
-    "annunciatorStatUpdate()\0flashShowStation()\0"
+    "MainWindow\0\0stationUpdate()\0"
+    "flashShowStation()\0"
 };
 
 const QMetaObject MainWindow::staticMetaObject = {
@@ -68,12 +66,10 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
         case 0: stationUpdate(); break;
-        case 1: ccStatUpdate(); break;
-        case 2: annunciatorStatUpdate(); break;
-        case 3: flashShowStation(); break;
+        case 1: flashShowStation(); break;
         default: ;
         }
-        _id -= 4;
+        _id -= 2;
     }
     return _id;
 }

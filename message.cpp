@@ -27,21 +27,21 @@ Message::Message()
         dataHandle = new DataHandle();
         dataHandle->enable(uart);
     }
-    connect(dataHandle,SIGNAL(ccStatChanged()),this,SIGNAL(ccStatChanged()));
-    connect(dataHandle,SIGNAL(annunciatorStatChanged()),this,SIGNAL(annunciatorStatChanged()));
+    //connect(dataHandle,SIGNAL(ccStatChanged()),this,SIGNAL(ccStatChanged()));
+    //connect(dataHandle,SIGNAL(annunciatorStatChanged()),this,SIGNAL(annunciatorStatChanged()));
 }
 Message::~Message()
 {
-    disconnect(dataHandle,SIGNAL(ccStatChanged()),this,SIGNAL(ccStatChanged()));
-    disconnect(dataHandle,SIGNAL(annunciatorStatChanged()),this,SIGNAL(annunciatorStatChanged()));
+    //disconnect(dataHandle,SIGNAL(ccStatChanged()),this,SIGNAL(ccStatChanged()));
+    //disconnect(dataHandle,SIGNAL(annunciatorStatChanged()),this,SIGNAL(annunciatorStatChanged()));
     if(uart)
         delete uart;
     delete dataHandle;
 }
 //启动
-void Message::start()
+void Message::startDCP()
 {
-    dataHandle->start();
+    dataHandle->startDCP();
 }
 //口播，司机对整列车进行讲话广播
 void Message::pa()
@@ -72,6 +72,11 @@ void Message::mo()
 void Message::ptt(bool push)
 {
     dataHandle->ptt(push);
+}
+//设置起始站 设置终点站 设置当前站 设置下一站
+void Message::setStation(uchar f,uchar l,uchar c,uchar n)
+{
+    dataHandle->setStation(f,l,c,n);
 }
 
 //UartHanle
@@ -220,12 +225,15 @@ void UartHandle::run()
     }
     qDebug()<<"[RHA][ERROR] UartHandle::run() exit";
 }
+//通过串口发送数据
+//对需要发送的数据进行转码处理，并添加帧头和帧尾
 void UartHandle::sendData(const QByteArray & dat)
 {
     QByteArray p;
     uchar d;
-    p.append(0x7e);
-
+    p.append(0x7e); //添加帧头
+    //转码
+    //0x7e->0x7f80;0x7f->0x7f81
     for(int i = 0;i<dat.count();i++)
     {
         d = (uchar)dat.at(i);
@@ -242,7 +250,7 @@ void UartHandle::sendData(const QByteArray & dat)
             p.append(d);
         }
     }
-    p.append(0x7e);
+    p.append(0x7e); //添加帧尾
     writeLock.lock();
     write(fd,p.constData(),p.count());
     writeLock.unlock();
@@ -251,13 +259,32 @@ void UartHandle::sendData(const QByteArray & dat)
 //DataHandle
 DataHandle::DataHandle()
 {
+    moStat = false;
+    spStat = 0;
     ccStat = 0;
+    spStat = 0;
+    firstStation = 0;
+    lastStation = 0;
+    currentStation = 0;
+    nextStation = 0;
+    skipStation = 0;
+    broadcastCode = 0;
+    broadcastStat = 0;
     for(int i=0;i<8;i++)
         annunciatorStat[i] = 0;
     uart = NULL;
+    dataDCP.fill(0,DCP_DATA_SIZE);
+    timer = NULL;
 }
 DataHandle::~DataHandle()
-{}
+{
+    if(timer!=NULL)
+    {
+        timer->stop();
+        disconnect(timer,SIGNAL(timeout()),this,SLOT(timerHandle()));
+        delete timer;
+    }
+}
 //启动数据分析线程
 bool DataHandle::enable(UartHandle *handle)
 {
@@ -268,6 +295,9 @@ bool DataHandle::enable(UartHandle *handle)
     if(data==NULL)
         return false;
     this->start();
+    timer = new QTimer();
+    connect(timer,SIGNAL(timeout()),this,SLOT(timerHandle()));
+    timer->start(100);
     return true;
 }
 void DataHandle::run()
@@ -278,6 +308,7 @@ void DataHandle::run()
         //qDebug()<<"[RHA]DataHandle run()";
         //等待数据更新
         data->waitUpdate();
+        sendData();
         //获取数据包
         packets = data->getDataPackets();
         //qDebug("[RHA]recv %d packets",packets.count());
@@ -340,11 +371,12 @@ void DataHandle::sendData()
 {
     QByteArray p;
     QByteArray dcp;
+    uchar t;
     uchar sum = 0;
     //目的车厢号
-    p.append(0x01);
+    p.append((char)0x0);
     //目的设备号
-    p.append(0x01);
+    p.append((char)0x0);
     //源车厢号
     p.append((char)0x0);
     //源设备号
@@ -354,27 +386,46 @@ void DataHandle::sendData()
     //应用层数据长度
     p.append(22);  //22个字节
     //应用层数据内容
-    dcp = dataDCP;
-   p.append(dcp);
+    dcp.clear();
+    dcp.append(this->firstStation);     //0,起始站
+    dcp.append(this->lastStation);      //1,终点站
+    dcp.append(this->currentStation);   //2,当前站
+    dcp.append(this->nextStation);      //3,下一站
+    dcp.append(this->skipStation);      //4,越站代码
+    dcp.append(this->broadcastCode);    //5,紧急广播代码
+    dcp.append(this->broadcastStat);    //6,广播状态
+    t = dataDCP.at(7);
+    t = (t&(~0x3)) | (0x3&ccStat);//司机对将状态
+    dcp.append(t);      //7,列车状态
+    dcp.append((char *)annunciatorStat,8);
+    p.append(dcp);      //8-15,报警器状态
+    p.append(dataDCP.mid(16,6));//16-21,
     //校验和
    for(int i = 0;i<p.count();i++)
        sum+=(uchar)p.at(i);
+   sum = 0x55 - sum;
    p.append(sum);
    uart->sendData(p);
 }
-//获取列车状态,第8个字节,并作相应的处理
+//获取列车状态,第7、8个字节,并作相应的处理
+
 void DataHandle::updateTrainStat()
 {
     if(dataDCP.count() != DCP_DATA_SIZE)
         return;
-    uchar d = dataDCP.at(7); 
+    uchar d = dataDCP.at(6);
+    //检查广播状态的变化
+    if(broadcastStat != d)
+    {
+        broadcastStat = d;
+    }
+    d = dataDCP.at(7);
     //检查司机对讲状态的变化
-    if( d&0x3 != ccStat )
+    if( d&0x3 != ccStat&0x3 )
     {
         ccStat = d&0x3;
         //发出状态变化信号
-        emit this->ccStatChanged();
-        setLEDStat(LED_CC,d&0x3);
+        //emit this->ccStatChanged();
     }
 }
 //获取报警器状态,第9到16字节共8个字节，并作相应的处理
@@ -382,24 +433,13 @@ void DataHandle::updateAnnunciatorStat()
 {
     if(dataDCP.count() != DCP_DATA_SIZE)
         return;
-    bool have,changed;
-    have = false;
-    changed = false;
     for(int i=0;i<8;i++)
     {
         uchar d = dataDCP.at(8+i);
         if( d != annunciatorStat[i] )
         {
             annunciatorStat[i] = d;
-            changed = true;
         }
-    }
-    //如果状态发生了改变，发送状态变化信号
-    if(changed)
-    {
-        emit this->annunciatorStatChanged();
-        setBellStat(have);
-        setLEDStat(LED_ANNUNCIATOR,have);
     }
 }
 //开启关闭振铃
@@ -409,15 +449,101 @@ void DataHandle::setBellStat(bool enable)
 void DataHandle::setLEDStat(int num,bool enable)
 {}
 //设置音量
-void DataHandle::setVolume()
+void DataHandle::setVolume(int v)
 {}
-//声音使能
+//MIC使能
 void DataHandle::setCSLoadStat(bool enable)
 {}
-//音量调节
-void DataHandle::sp()
+//定时器,100ms出发一次，用于维护广播控制盒的状态，如LED亮／灭／闪、蜂鸣器、音量控制
+void DataHandle::timerHandle()
 {
+    static bool flash;  //用于闪动控制
+    bool talkBack;  //对讲标识，包括PA，CC，PC
+    bool haveAnnunciator;   //当前是否有紧急报警
+    flash = !flash;
+    talkBack = false;
+    haveAnnunciator = false;
+    //qDebug()<<"timerHandle()";
+    //紧急对讲灯＆蜂鸣器控制
+    for(int i=0;i<8;i++)
+    {
+        for(int j=0;j<4;j++)
+        {
+            switch((annunciatorStat[i]>>(j*2))&0x3){
+            case 0x10:  //呼叫报警器
+                haveAnnunciator = true;
+                break;
+            case 0x20:  //应答不报警器
+                haveAnnunciator = true;
+                talkBack = true;
+                break;
+            }
+        }
+    }
+    if(haveAnnunciator)     //当前有警报
+    {
+        if(talkBack)    //已经接通了紧急报警
+        {
+            setLEDStat(LED_PC,true);
+            setBellStat(false);
+        }
+        else        //未接通紧急报警
+        {
+            setLEDStat(LED_PC,flash);
+            setBellStat(flash);     //启动蜂鸣器
+        }
+    }
+    else
+    {
+        setLEDStat(LED_PC,false);
+        setBellStat(false);
+    }
 
+    //口播状态灯控制
+    switch(broadcastStat&3){
+    case 0x0:   //无口播
+        setLEDStat(LED_PA,false);
+        break;
+    case 0x10:  //申请口播
+        setLEDStat(LED_PA,flash);
+        break;
+    case 0x20:  //正在口播
+    case 0x30:
+        setLEDStat(LED_PA,true);
+        talkBack = true;
+        break;
+    }
+    //CC状态灯
+    switch(ccStat&0x3){
+    case 0x0:   //挂断
+        setLEDStat(LED_CC,false);
+        break;
+    case 0x1:   //呼叫
+        setLEDStat(LED_CC,flash);
+        break;
+    case 0x2:   //应答
+        setLEDStat(LED_CC,true);
+        talkBack = true;
+        break;
+    }
+    //监听及音量控制
+    if(moStat)      //监听开启时
+    {
+        setVolume(spStat);
+        setLEDStat(LED_MO,true);
+    }
+    else    //关闭监听时
+    {
+        if(talkBack)    //处于对讲状态
+        {
+            setVolume(spStat);
+        }
+        else
+        {
+            setVolume(0);
+        }
+        setLEDStat(LED_MO,false);
+    }
 }
 //push to talk，按下时讲话，松开时听话
 void DataHandle::ptt(bool push)
@@ -425,14 +551,14 @@ void DataHandle::ptt(bool push)
     setCSLoadStat(push);
 }
 //启动
-void DataHandle::start()
+void DataHandle::startDCP()
 {
      sendData();
 }
 //口播，司机对整列车进行讲话广播
 void DataHandle::pa()
 {
-    paStat ^= 0x1;
+    broadcastStat ^= 0x10;  //发转“申请口播”状态位
     sendData();
 }
 //紧急对讲应答，司机对报警进行应答
@@ -444,11 +570,17 @@ void DataHandle::pc()
 void DataHandle::cc()
 {
     switch(ccStat&0x3){
-    case 0:
+    case 0:     //挂断状态
+        ccStat = 0x5;   //转成主叫状态
         break;
-    case 1:
+    case 1:     //呼叫状态
+        if(ccStat&0x4)  //主叫
+            ccStat = 0x0;   //挂断
+        else    //被叫
+            ccStat = 0x2;   //应答
         break;
-    case 2:
+    case 2:     //应答状态
+        ccStat = 0x0;   //挂断
         break;
     }
     sendData();
@@ -456,9 +588,25 @@ void DataHandle::cc()
 //监听
 void DataHandle::mo()
 {
-     sendData();
+    moStat = !moStat;
 }
-
+//音量调节
+void DataHandle::sp()
+{
+    spStat++;
+    if(spStat>3)
+        spStat = 1;
+}
+//设置起始站 设置终点站 设置当前站 设置下一站
+void DataHandle::setStation(uchar f,uchar l,uchar c,uchar n)
+{
+    firstStation = f;
+    lastStation = l;
+    currentStation = c;
+    nextStation = n;
+    qDebug("f=%d l=%d c=%d n=%d\n",f,l,c,n);
+    sendData();
+}
 
 //ResData
 ResData::ResData()
@@ -476,7 +624,9 @@ void ResData::addData(char *d,int len)
     update = true;
     updateCond.wakeAll();
 }
-//从现有数据中提取数据包
+//从现有数据中提取所有有效的数据包
+//数据包以0x7e作为起止符
+//对数据内容进行逆转码，0x7f80->0x7e;0x7f81->0x7f
 QList<QByteArray> & ResData::getDataPackets()
 {
     dataLock.lock();

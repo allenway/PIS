@@ -31,9 +31,9 @@ FormStationSet::FormStationSet(QWidget *parent) :
     ignorelist = settings.value("StationName/Ignore").toString().split(",");
     for(int i=0;i<stationsNum;i++)
     {
-        str = "StationName/" + QString::number(i);
+        str = "StationName/" + QString::number(i+1);
         litem = new QListWidgetItem(settings.value(str).toString());
-        if(ignorelist.contains(QString::number(i)))
+        if(ignorelist.contains(QString::number(i+1)))
             litem->setCheckState(Qt::Unchecked);
         else
             litem->setCheckState(Qt::Checked);
@@ -51,7 +51,7 @@ FormStationSet::FormStationSet(QWidget *parent) :
     QStringList broadcastList;
     for(int i=0;i<broadcastsNum;i++)
     {
-        str = "BroadCastInfo/" + QString::number(i);
+        str = "BroadCastInfo/" + QString::number(i+1);
         broadcastList = settings.value(str).toString().split(",");
         titem = new QTableWidgetItem();
         titem->setCheckState(Qt::Unchecked);
@@ -143,7 +143,7 @@ void FormStationSet::doMenuKey()
        settings.setIniCodec("UTF-8");
        QString str;
        QStringList strlist;
-       str = QString::number(widgetListIndex-widgetList.indexOf(ui->listWidgetStation));
+       str = QString::number(widgetListIndex-widgetList.indexOf(ui->listWidgetStation)+1);
        strlist = settings.value("StationName/Ignore").toString().split(",");
        if(state==Qt::Checked)
        {
@@ -213,7 +213,7 @@ bool FormStationSet::eventFilter(QObject *obj, QEvent *e)
         case RHA_KEY_BACK:
             qDebug("KEY_BACK");
             //退出界面
-            //if(isStationChanged)
+            if(isStationChanged)
                 emit stationChanged();
             isStationChanged = false;
             hide();

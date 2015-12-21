@@ -13,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowFlags(Qt::FramelessWindowHint);//去掉标题栏
+    //添加消息处理中心
+    msgHandle = new Message();
     //加载站台地图
     timerFlash = new QTimer(this);
     loadMap();
@@ -20,21 +22,20 @@ MainWindow::MainWindow(QWidget *parent) :
     menu = new FormMenu(this);
     menu->move(0,0);
     menu->hide();
-    //添加消息处理中心
-    msgHandle = new Message();
+
 
     connect(menu,SIGNAL(stationChanged()),this,SLOT(stationUpdate()));
     connect(timerFlash,SIGNAL(timeout()),this,SLOT(flashShowStation()));
-    connect(msgHandle,SIGNAL(ccStatChanged()),this,SLOT(ccStatUpdate()));
-    connect(msgHandle,SIGNAL(annunciatorStatChanged()),this,SLOT(annunciatorStatUpdate()));
+    //connect(msgHandle,SIGNAL(ccStatChanged()),this,SLOT(ccStatUpdate()));
+   //connect(msgHandle,SIGNAL(annunciatorStatChanged()),this,SLOT(annunciatorStatUpdate()));
 }
 
 MainWindow::~MainWindow()
 {
     disconnect(menu,SIGNAL(stationChanged()),this,SLOT(stationUpdate()));
     disconnect(timerFlash,SIGNAL(timeout()),this,SLOT(flashShowStation()));
-    disconnect(msgHandle,SIGNAL(ccStatChanged()),this,SLOT(ccStatUpdate()));
-    disconnect(msgHandle,SIGNAL(annunciatorStatChanged()),this,SLOT(annunciatorStatUpdate()));
+    //disconnect(msgHandle,SIGNAL(ccStatChanged()),this,SLOT(ccStatUpdate()));
+    //disconnect(msgHandle,SIGNAL(annunciatorStatChanged()),this,SLOT(annunciatorStatUpdate()));
     delete msgHandle;
     delete labelDirection;
     delete labelStationName;
@@ -208,7 +209,7 @@ void MainWindow::loadMap()
         QString str;
         stationState[i] = RHA_Normal;
         labelStationName[i].setParent(this->ui->centralWidget);
-        str = "StationName/" + QString::number(i);
+        str = "StationName/" + QString::number(i+1);
         labelStationName[i].setText(settings.value(str).toString());
         labelStationPix[i].setParent(this->ui->centralWidget);      
         labelStationPix[i].setScaledContents(true);
@@ -277,14 +278,12 @@ void MainWindow::stationUpdate()
     }
     //设置车站状态信息（经过、不经过、已经经过）
     QStringList ignorelist;
-    QString str;
     ignorelist = settings.value("StationName/Ignore").toString().split(",");
 
     //设置不经过站台
     for(int i=0;i<stationsNum;i++)
     {
-        str = "StationName/" + QString::number(i);
-        if(ignorelist.contains(QString::number(i)))
+        if(ignorelist.contains(QString::number(i+1)))
         {
             stationState[i] = RHA_NoPass;
         }
@@ -406,7 +405,16 @@ void MainWindow::stationUpdate()
         }
     }
     //查询当前车站
+    firstStationIndex = -1;
+    lastStationIndex = -1;
     currentStationIndex = -1;
+    nextStationIndex = -1;
+#if 0
+    if(isReverse)
+    {
+
+    }
+#else
     if(isReverse)
     {
         //查找最后一个已经到的站
@@ -463,15 +471,16 @@ void MainWindow::stationUpdate()
                 isArrive = true;
         }
     }
+#endif
     //显示当前站台
     showCurrentStation();
 }
-//司机对讲状态更新
-void MainWindow::ccStatUpdate()
-{}
-//报警器状态更新
-void MainWindow::annunciatorStatUpdate()
-{}
+////司机对讲状态更新
+//void MainWindow::ccStatUpdate()
+//{}
+////报警器状态更新
+//void MainWindow::annunciatorStatUpdate()
+//{}
 void MainWindow::flashShowStation()
 {
     static bool ok = true;
@@ -500,6 +509,8 @@ void MainWindow::showCurrentStation()
             labelStationPix[oldIndex].setVisible(true);
         oldIndex = -1;
     }
+    if(msgHandle!=NULL)
+        msgHandle->setStation(firstStationIndex+1,lastStationIndex+1,currentStationIndex+1,nextStationIndex+1);
 }
 
 //下一车站
@@ -613,7 +624,7 @@ void MainWindow::leaveStation()
 //启动
 void MainWindow::start()
 {
-    msgHandle->start();
+    msgHandle->startDCP();
 }
 //口播，司机对整列车进行讲话广播
 void MainWindow::pa()
