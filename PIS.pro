@@ -13,16 +13,19 @@ SOURCES += main.cpp \
     formsysstatus.cpp \
     formmenu.cpp \
     formaudio.cpp \
-    message.cpp
+    message.cpp \
+    dialogselectannunciator.cpp
 HEADERS += mainwindow.h \
     formstationset.h \
     formsysstatus.h \
     formmenu.h \
     formaudio.h \
     message.h \
-    rha.h
+    rha.h \
+    dialogselectannunciator.h
 FORMS += mainwindow.ui \
     formstationset.ui \
     formsysstatus.ui \
     formmenu.ui \
-    formaudio.ui
+    formaudio.ui \
+    dialogselectannunciator.ui

@@ -1,5 +1,6 @@
 #include "message.h"
 #include "rha.h"
+#include "dialogselectannunciator.h"
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -308,7 +309,6 @@ void DataHandle::run()
         //qDebug()<<"[RHA]DataHandle run()";
         //等待数据更新
         data->waitUpdate();
-        sendData();
         //获取数据包
         packets = data->getDataPackets();
         //qDebug("[RHA]recv %d packets",packets.count());
@@ -470,10 +470,10 @@ void DataHandle::timerHandle()
         for(int j=0;j<4;j++)
         {
             switch((annunciatorStat[i]>>(j*2))&0x3){
-            case 0x10:  //呼叫报警器
+            case 0x1:  //呼叫报警器
                 haveAnnunciator = true;
                 break;
-            case 0x20:  //应答不报警器
+            case 0x2:  //应答报警器
                 haveAnnunciator = true;
                 talkBack = true;
                 break;
@@ -500,7 +500,7 @@ void DataHandle::timerHandle()
     }
 
     //口播状态灯控制
-    switch(broadcastStat&3){
+    switch(broadcastStat&0x30){
     case 0x0:   //无口播
         setLEDStat(LED_PA,false);
         break;
@@ -561,10 +561,81 @@ void DataHandle::pa()
     broadcastStat ^= 0x10;  //发转“申请口播”状态位
     sendData();
 }
+//选择接通报警器,如果有多个报警器，弹出界面由司机进行选择需要接通的报警器
+void DataHandle::selectAnnunciatorStat()
+{
+    int count,first;
+    count = 0;
+    for(int i=0;i<8;i++)
+    {
+        for(int j=0;j<4;j++)
+        {
+            if( ((annunciatorStat[i]>>(j*2))&0x3) == 0x1)
+            {
+                count++;
+                first = i*4+j;
+            }
+        }
+    }
+    if(count==0)
+        return;
+    else if(count==1)
+    {
+       //应答,将警报器状态设置成0x2,即应答状态
+        annunciatorStat[first/4] = (annunciatorStat[first/4]&(~(0x3<<((first%4)*2))))|(0x2<<((first%4)*2));
+    }
+    else
+    {
+        static DialogSelectAnnunciator dialog;
+        dialog.select(annunciatorStat);
+    }
+}
 //紧急对讲应答，司机对报警进行应答
 void DataHandle::pc()
 {
-     sendData();
+    //检查紧急对讲状态:无警报、有警报、已经联通警报
+    bool haveAnnunciator,talkBack;
+    haveAnnunciator = false;
+    talkBack = false;
+    for(int i=0;i<8;i++)
+    {
+        for(int j=0;j<4;j++)
+        {
+            switch((annunciatorStat[i]>>(j*2))&0x3){
+            case 0x1:  //呼叫报警器
+                haveAnnunciator = true;
+                break;
+            case 0x2:  //应答报警器
+                haveAnnunciator = true;
+                talkBack = true;
+                break;
+            }
+        }
+    }
+    if(haveAnnunciator)     //当前有警报
+    {
+        if(talkBack)    //正在紧急对讲通话
+        {         
+            for(int i=0;i<8;i++)
+            {
+                for(int j=0;j<4;j++)
+                {
+                    if( ((annunciatorStat[i]>>(j*2))&0x3) == 0x2 )
+                    {
+                        annunciatorStat[i] &= ~(0x3<<(j*2));     //挂断
+                    }
+                }
+            }
+        }
+        else    //有紧急对讲呼叫
+        {
+            //由司机选择接通任一报警器
+            selectAnnunciatorStat();
+        }
+    }
+    else        //当前没有警报
+        return;
+    sendData();
 }
 //司机与司机之间进行对讲
 void DataHandle::cc()
@@ -604,7 +675,7 @@ void DataHandle::setStation(uchar f,uchar l,uchar c,uchar n)
     lastStation = l;
     currentStation = c;
     nextStation = n;
-    qDebug("f=%d l=%d c=%d n=%d\n",f,l,c,n);
+    //qDebug("f=%d l=%d c=%d n=%d\n",f,l,c,n);
     sendData();
 }
 

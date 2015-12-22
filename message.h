@@ -98,10 +98,11 @@ private:
     void sendData();
     void updateTrainStat();         //获取列车状态,第8个字节
     void updateAnnunciatorStat();   //获取报警器状态,第9到16字节共8个字节
-    void setBellStat(bool enable);  //开启关闭振铃
-    void setLEDStat(int num,bool enable);   //开启关闭指定LED灯
-    void setVolume(int v);       //设置音量
-    void setCSLoadStat(bool enable);    //MIC使能
+    void setBellStat(bool enable);  //开启关闭振铃?
+    void setLEDStat(int num,bool enable);   //开启关闭指定LED灯?
+    void setVolume(int v);       //设置音量?
+    void setCSLoadStat(bool enable);    //MIC使能?
+    void selectAnnunciatorStat();       //选择接通报警器,如果有多个报警器，弹出界面由司机进行选择需要接通的报警器
 
 private slots:
     void timerHandle(); //定时器,100ms出发一次，用于维护广播控制盒的状态，如LED亮／灭／闪、蜂鸣器、音量控制

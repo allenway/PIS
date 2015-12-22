@@ -172,7 +172,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e)
         return QObject::eventFilter(obj, e);
 }
 
-//加载站台地图信息
+//加载站台地图信息,将所有的车站信息以及图标位置加载到LCD显示屏幕上
 void MainWindow::loadMap()
 {
     //加载地图
@@ -261,7 +261,7 @@ void MainWindow::loadMap()
     stationUpdate();
 }
 
-
+//车站信息更新，包括越战、当前站、运行方向、起始站、终点站
 void MainWindow::stationUpdate()
 {
     QSettings settings(SYSTEM_CONFIG_PATH, QSettings::IniFormat);
@@ -289,10 +289,12 @@ void MainWindow::stationUpdate()
         }
         else if(stationState[i]==RHA_NoPass)
         {
-            stationState[i] = RHA_Unknow;
+            stationState[i] = RHA_Unknow;//不确定是否已经经过
         }
     }
     //设置经过、已经经过站台信息
+    firstStationIndex = -1;
+    lastStationIndex = -1;
     if(isReverse)
     {
         StationState state = RHA_Normal;
@@ -312,8 +314,10 @@ void MainWindow::stationUpdate()
         //如果列车运行方向发生了变化,那么重置所有站台
         for(int i = 0;i<stationsNum;i++)
         {
+            //查找终点站，从列车运行的方向查找第一个需要经过的车站
             if(stationState[i]!=RHA_NoPass)
             {
+                //如果终点站已经为经过状态，则说明列车的运行方向已经更改了
                 if(stationState[i]==RHA_Pass)
                 {
                     //重置所有站台
@@ -326,7 +330,10 @@ void MainWindow::stationUpdate()
                             break;
                         }
                     }
+                    isArrive = true;//重置到站标志
                 }
+                //记录终点站
+                lastStationIndex = i;
                 break;
             }
         }
@@ -336,6 +343,8 @@ void MainWindow::stationUpdate()
             if(stationState[i]!=RHA_NoPass)
             {
                 stationState[i] = RHA_Pass;
+                //记录起始站
+                firstStationIndex = i;
                 break;
             }
         }
@@ -359,8 +368,10 @@ void MainWindow::stationUpdate()
         //如果列车运行方向发生了变化,那么重置所有站台
         for(int i = stationsNum-1;i>=0;i--)
         {
+             //查找终点站，从列车运行的方向查找第一个需要经过的车站
             if(stationState[i]!=RHA_NoPass)
             {
+                //如果终点站已经为经过状态，则说明列车的运行方向已经更改了
                 if(stationState[i]==RHA_Pass)
                 {
                     //重置所有站台
@@ -373,7 +384,10 @@ void MainWindow::stationUpdate()
                             break;
                         }
                     }
+                    isArrive = true;//重置到站标志
                 }
+                //记录终点站
+                lastStationIndex = i;
                 break;
             }
         }
@@ -383,11 +397,12 @@ void MainWindow::stationUpdate()
             if(stationState[i]!=RHA_NoPass)
             {
                 stationState[i] = RHA_Pass;
+                //记录起始站
+                firstStationIndex = i;
                 break;
             }
         }
     }
-
 
     //显示站台图标
     for(int i=0;i<stationsNum;i++)
@@ -405,16 +420,8 @@ void MainWindow::stationUpdate()
         }
     }
     //查询当前车站
-    firstStationIndex = -1;
-    lastStationIndex = -1;
     currentStationIndex = -1;
     nextStationIndex = -1;
-#if 0
-    if(isReverse)
-    {
-
-    }
-#else
     if(isReverse)
     {
         //查找最后一个已经到的站
@@ -423,24 +430,18 @@ void MainWindow::stationUpdate()
             if(stationState[i]==RHA_Pass)
             {
                 currentStationIndex = i;
+                nextStationIndex = i;
                 break;
             }
         }
-        //如果现在是离站状态,则查询下一个站台
-        if(!isArrive)
+        //查询下一个站台
+        for(int i=currentStationIndex;i>=0;i--)
         {
-            //查询下一个站台
-            for(int i=currentStationIndex;i>=0;i--)
+            if(stationState[i]==RHA_Normal)
             {
-                if(stationState[i]==RHA_Normal)
-                {
-                    currentStationIndex = i;
-                    break;
-                }
+                nextStationIndex = i;
+                break;
             }
-            //如果查询不到下个站台，说明已经到达终点站了
-            if(stationState[currentStationIndex]==RHA_Pass)
-                isArrive = true;
         }
     }
     else
@@ -451,27 +452,20 @@ void MainWindow::stationUpdate()
             if(stationState[i]==RHA_Pass)
             {
                 currentStationIndex = i;
+                nextStationIndex = i;
                 break;
             }
         }
-        //如果现在是离站状态,则查询下一个站台
-        if(!isArrive)
+        //查询下一个站台
+        for(int i=currentStationIndex;i<stationsNum;i++)
         {
-            //查询下一个站台
-            for(int i=currentStationIndex;i<stationsNum;i++)
+            if(stationState[i]==RHA_Normal)
             {
-                if(stationState[i]==RHA_Normal)
-                {
-                    currentStationIndex = i;
-                    break;
-                }
+                nextStationIndex = i;
+                break;
             }
-            //如果查询不到下个站台，说明已经到达终点站了
-            if(stationState[currentStationIndex]==RHA_Pass)
-                isArrive = true;
         }
     }
-#endif
     //显示当前站台
     showCurrentStation();
 }
@@ -484,25 +478,26 @@ void MainWindow::stationUpdate()
 void MainWindow::flashShowStation()
 {
     static bool ok = true;
-    labelStationPix[currentStationIndex].setVisible(ok);
+    labelStationPix[nextStationIndex].setVisible(ok);
     ok = !ok;
 }
 void MainWindow::showCurrentStation()
 {
     static int oldIndex = -1;
-    labelStationPix[currentStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/Arrive.png")));
     //未到站显示闪动标志
     if(!isArrive)
     {
+        labelStationPix[nextStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/Arrive.png")));
         if(!timerFlash->isActive())
             timerFlash->start(500);
         if(oldIndex != -1)
             labelStationPix[oldIndex].setVisible(true);
-        oldIndex = currentStationIndex;
+        oldIndex = nextStationIndex;
 
     }
     else
     {
+        labelStationPix[currentStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/Arrive.png")));
         if(timerFlash->isActive())
             timerFlash->stop();
         if(oldIndex != -1)
@@ -516,31 +511,35 @@ void MainWindow::showCurrentStation()
 //下一车站
 void MainWindow::nextStation()
 {
-    isArrive = true;
+    stationState[nextStationIndex] = RHA_Normal;
+    labelStationPix[nextStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/NormalStation.png")));
     stationState[currentStationIndex] = RHA_Pass;
     labelStationPix[currentStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/PassStation.png")));
+    currentStationIndex = nextStationIndex;
     if(isReverse)
     {
-        for(int i=currentStationIndex-1;i>=0;i--)
+        for(int i=nextStationIndex-1;i>=0;i--)
         {
             if(stationState[i]==RHA_Normal)
             {
-                currentStationIndex = i;
+                nextStationIndex = i;
                 break;
             }
         }
     }
     else
     {
-        for(int i=currentStationIndex+1;i<stationsNum;i++)
+        for(int i=nextStationIndex+1;i<stationsNum;i++)
         {
             if(stationState[i]==RHA_Normal)
             {
-                currentStationIndex = i;
+                nextStationIndex = i;
                 break;
             }
         }
-    }
+    } 
+    stationState[nextStationIndex] = RHA_Normal;
+    labelStationPix[nextStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/NormalStation.png")));
     stationState[currentStationIndex] = RHA_Pass;
     labelStationPix[currentStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/PassStation.png")));
     //显示当前站台
@@ -548,16 +547,18 @@ void MainWindow::nextStation()
 }
 //上一车站
 void MainWindow::prevStation()
-{
-    isArrive = true;
-    stationState[currentStationIndex] = RHA_Normal;
-    labelStationPix[currentStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/NormalStation.png")));
+{  
+    stationState[nextStationIndex] = RHA_Normal;
+    labelStationPix[nextStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/NormalStation.png")));
+    stationState[currentStationIndex] = RHA_Pass;
+    labelStationPix[currentStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/PassStation.png")));
     if(!isReverse)
     {
         for(int i=currentStationIndex-1;i>=0;i--)
         {
             if(stationState[i]==RHA_Pass)
             {
+                nextStationIndex = currentStationIndex;
                 currentStationIndex = i;
                 break;
             }
@@ -569,11 +570,14 @@ void MainWindow::prevStation()
         {
             if(stationState[i]==RHA_Pass)
             {
+                nextStationIndex = currentStationIndex;
                 currentStationIndex = i;
                 break;
             }
         }
     }
+    stationState[nextStationIndex] = RHA_Normal;
+    labelStationPix[nextStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/NormalStation.png")));
     stationState[currentStationIndex] = RHA_Pass;
     labelStationPix[currentStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/PassStation.png")));
     //显示当前站台
@@ -582,7 +586,35 @@ void MainWindow::prevStation()
 //进站
 void MainWindow::arriveStation()
 {
+    //已经是到站状态，直接返回
+    if(isArrive)
+        return;
     isArrive = true;
+    currentStationIndex = nextStationIndex;
+    if(isReverse)
+    {
+        for(int i=nextStationIndex-1;i>=0;i--)
+        {
+            if(stationState[i]==RHA_Normal)
+            {
+                nextStationIndex = i;
+                break;
+            }
+        }
+    }
+    else
+    {
+        for(int i=nextStationIndex+1;i<stationsNum;i++)
+        {
+            if(stationState[i]==RHA_Normal)
+            {
+                nextStationIndex = i;
+                break;
+            }
+        }
+    }
+    stationState[nextStationIndex] = RHA_Normal;
+    labelStationPix[nextStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/NormalStation.png")));
     stationState[currentStationIndex] = RHA_Pass;
     labelStationPix[currentStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/PassStation.png")));
     //显示当前站台
@@ -591,33 +623,44 @@ void MainWindow::arriveStation()
 //离站
 void MainWindow::leaveStation()
 {
-    isArrive = false;
+    stationState[nextStationIndex] = RHA_Normal;
+    labelStationPix[nextStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/NormalStation.png")));
     stationState[currentStationIndex] = RHA_Pass;
     labelStationPix[currentStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/PassStation.png")));
-    if(isReverse)
+    if(isArrive)    //当站状态，直接更改标志即可
     {
-        for(int i=currentStationIndex-1;i>=0;i--)
-        {
-            if(stationState[i]==RHA_Normal)
-            {
-                currentStationIndex = i;
-                break;
-            }
-        }
+        isArrive = false;   //设置成离站状态
     }
     else
     {
-        for(int i=currentStationIndex+1;i<stationsNum;i++)
+        currentStationIndex = nextStationIndex;
+        if(isReverse)
         {
-            if(stationState[i]==RHA_Normal)
+            for(int i=nextStationIndex-1;i>=0;i--)
             {
-                currentStationIndex = i;
-                break;
+                if(stationState[i]==RHA_Normal)
+                {
+                    nextStationIndex = i;
+                    break;
+                }
             }
         }
+        else
+        {
+            for(int i=nextStationIndex+1;i<stationsNum;i++)
+            {
+                if(stationState[i]==RHA_Normal)
+                {
+                    nextStationIndex = i;
+                    break;
+                }
+            }
+        }
+        stationState[nextStationIndex] = RHA_Normal;
+        labelStationPix[nextStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/NormalStation.png")));
+        stationState[currentStationIndex] = RHA_Pass;
+        labelStationPix[currentStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/PassStation.png")));
     }
-    stationState[currentStationIndex] = RHA_Normal;
-    labelStationPix[currentStationIndex].setPixmap(QPixmap(QString::fromUtf8("image/NormalStation.png")));
     //显示当前站台
     showCurrentStation();
 }

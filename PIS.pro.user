@@ -235,17 +235,17 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Release</value>
    <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-qYmoaW7FzI,guid=9caed1804c63575d983cbb17000001ef</value>
+    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-4AniC7iZTL,guid=562c5fdbbb528597639329e600000023</value>
     <value type="QString">DEFAULTS_PATH=/usr/share/gconf/gnome-shell.default.path</value>
     <value type="QString">DESKTOP_SESSION=gnome-shell</value>
     <value type="QString">DISPLAY=:0.0</value>
     <value type="QString">GDMSESSION=gnome-shell</value>
     <value type="QString">GIO_LAUNCHED_DESKTOP_FILE=/home/liulu/Desktop/QtCreator.desktop</value>
-    <value type="QString">GIO_LAUNCHED_DESKTOP_FILE_PID=2363</value>
+    <value type="QString">GIO_LAUNCHED_DESKTOP_FILE_PID=2128</value>
     <value type="QString">GNOME_DESKTOP_SESSION_ID=this-is-deprecated</value>
-    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-ODkPUr</value>
-    <value type="QString">GNOME_KEYRING_PID=1793</value>
-    <value type="QString">GPG_AGENT_INFO=/tmp/keyring-ODkPUr/gpg:0:1</value>
+    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-yZW3yY</value>
+    <value type="QString">GNOME_KEYRING_PID=1515</value>
+    <value type="QString">GPG_AGENT_INFO=/tmp/keyring-yZW3yY/gpg:0:1</value>
     <value type="QString">GTK_IM_MODULE=ibus</value>
     <value type="QString">HOME=/home/liulu</value>
     <value type="QString">LANG=en_US.UTF-8</value>
@@ -256,10 +256,10 @@
     <value type="QString">PWD=/opt/software/opt/qtcreator-1.3.0/bin</value>
     <value type="QString">QTDIR=/opt/rha/qt-4.5/__install/arm/</value>
     <value type="QString">QT_IM_MODULE=xim</value>
-    <value type="QString">SESSION_MANAGER=local/liulu:@/tmp/.ICE-unix/1804,unix/liulu:/tmp/.ICE-unix/1804</value>
+    <value type="QString">SESSION_MANAGER=local/liulu:@/tmp/.ICE-unix/1526,unix/liulu:/tmp/.ICE-unix/1526</value>
     <value type="QString">SHELL=/bin/bash</value>
-    <value type="QString">SSH_AGENT_PID=1869</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-ODkPUr/ssh</value>
+    <value type="QString">SSH_AGENT_PID=1617</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-yZW3yY/ssh</value>
     <value type="QString">UBUNTU_MENUPROXY=libappmenu.so</value>
     <value type="QString">USER=liulu</value>
     <value type="QString">XAUTHORITY=/home/liulu/.Xauthority</value>
@@ -267,7 +267,7 @@
     <value type="QString">XDG_CURRENT_DESKTOP=GNOME</value>
     <value type="QString">XDG_DATA_DIRS=/usr/share/gnome-shell:/usr/share/gnome:/usr/local/share/:/usr/share/</value>
     <value type="QString">XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0</value>
-    <value type="QString">XDG_SESSION_COOKIE=55bc1cecd29849efab862e4700000005-1450089777.240939-1429668537</value>
+    <value type="QString">XDG_SESSION_COOKIE=55bc1cecd29849efab862e4700000005-1450772051.697541-2100646425</value>
     <value type="QString">XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0</value>
     <value type="QString">XMODIFIERS=@im=ibus</value>
    </valuelist>
@@ -287,17 +287,17 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Release</value>
    <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-qYmoaW7FzI,guid=9caed1804c63575d983cbb17000001ef</value>
+    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-4AniC7iZTL,guid=562c5fdbbb528597639329e600000023</value>
     <value type="QString">DEFAULTS_PATH=/usr/share/gconf/gnome-shell.default.path</value>
     <value type="QString">DESKTOP_SESSION=gnome-shell</value>
     <value type="QString">DISPLAY=:0.0</value>
     <value type="QString">GDMSESSION=gnome-shell</value>
     <value type="QString">GIO_LAUNCHED_DESKTOP_FILE=/home/liulu/Desktop/QtCreator.desktop</value>
-    <value type="QString">GIO_LAUNCHED_DESKTOP_FILE_PID=2363</value>
+    <value type="QString">GIO_LAUNCHED_DESKTOP_FILE_PID=2128</value>
     <value type="QString">GNOME_DESKTOP_SESSION_ID=this-is-deprecated</value>
-    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-ODkPUr</value>
-    <value type="QString">GNOME_KEYRING_PID=1793</value>
-    <value type="QString">GPG_AGENT_INFO=/tmp/keyring-ODkPUr/gpg:0:1</value>
+    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-yZW3yY</value>
+    <value type="QString">GNOME_KEYRING_PID=1515</value>
+    <value type="QString">GPG_AGENT_INFO=/tmp/keyring-yZW3yY/gpg:0:1</value>
     <value type="QString">GTK_IM_MODULE=ibus</value>
     <value type="QString">HOME=/home/liulu</value>
     <value type="QString">LANG=en_US.UTF-8</value>
@@ -308,10 +308,10 @@
     <value type="QString">PWD=/opt/software/opt/qtcreator-1.3.0/bin</value>
     <value type="QString">QTDIR=/opt/rha/qt-4.5/__install/arm/</value>
     <value type="QString">QT_IM_MODULE=xim</value>
-    <value type="QString">SESSION_MANAGER=local/liulu:@/tmp/.ICE-unix/1804,unix/liulu:/tmp/.ICE-unix/1804</value>
+    <value type="QString">SESSION_MANAGER=local/liulu:@/tmp/.ICE-unix/1526,unix/liulu:/tmp/.ICE-unix/1526</value>
     <value type="QString">SHELL=/bin/bash</value>
-    <value type="QString">SSH_AGENT_PID=1869</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-ODkPUr/ssh</value>
+    <value type="QString">SSH_AGENT_PID=1617</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-yZW3yY/ssh</value>
     <value type="QString">UBUNTU_MENUPROXY=libappmenu.so</value>
     <value type="QString">USER=liulu</value>
     <value type="QString">XAUTHORITY=/home/liulu/.Xauthority</value>
@@ -319,7 +319,7 @@
     <value type="QString">XDG_CURRENT_DESKTOP=GNOME</value>
     <value type="QString">XDG_DATA_DIRS=/usr/share/gnome-shell:/usr/share/gnome:/usr/local/share/:/usr/share/</value>
     <value type="QString">XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0</value>
-    <value type="QString">XDG_SESSION_COOKIE=55bc1cecd29849efab862e4700000005-1450089777.240939-1429668537</value>
+    <value type="QString">XDG_SESSION_COOKIE=55bc1cecd29849efab862e4700000005-1450772051.697541-2100646425</value>
     <value type="QString">XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0</value>
     <value type="QString">XMODIFIERS=@im=ibus</value>
    </valuelist>
@@ -337,17 +337,17 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Release</value>
    <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-gi7GdAc2bM,guid=cb47ed7c4687080938fd03660000001f</value>
+    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-4AniC7iZTL,guid=562c5fdbbb528597639329e600000023</value>
     <value type="QString">DEFAULTS_PATH=/usr/share/gconf/gnome-shell.default.path</value>
     <value type="QString">DESKTOP_SESSION=gnome-shell</value>
     <value type="QString">DISPLAY=:0.0</value>
     <value type="QString">GDMSESSION=gnome-shell</value>
     <value type="QString">GIO_LAUNCHED_DESKTOP_FILE=/home/liulu/Desktop/QtCreator.desktop</value>
-    <value type="QString">GIO_LAUNCHED_DESKTOP_FILE_PID=2332</value>
+    <value type="QString">GIO_LAUNCHED_DESKTOP_FILE_PID=2128</value>
     <value type="QString">GNOME_DESKTOP_SESSION_ID=this-is-deprecated</value>
-    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-577yqx</value>
-    <value type="QString">GNOME_KEYRING_PID=1498</value>
-    <value type="QString">GPG_AGENT_INFO=/tmp/keyring-577yqx/gpg:0:1</value>
+    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-yZW3yY</value>
+    <value type="QString">GNOME_KEYRING_PID=1515</value>
+    <value type="QString">GPG_AGENT_INFO=/tmp/keyring-yZW3yY/gpg:0:1</value>
     <value type="QString">GTK_IM_MODULE=ibus</value>
     <value type="QString">HOME=/home/liulu</value>
     <value type="QString">LANG=en_US.UTF-8</value>
@@ -358,10 +358,10 @@
     <value type="QString">PWD=/opt/software/opt/qtcreator-1.3.0/bin</value>
     <value type="QString">QTDIR=/opt/rha/qt-4.5/__install/arm/</value>
     <value type="QString">QT_IM_MODULE=xim</value>
-    <value type="QString">SESSION_MANAGER=local/liulu:@/tmp/.ICE-unix/1509,unix/liulu:/tmp/.ICE-unix/1509</value>
+    <value type="QString">SESSION_MANAGER=local/liulu:@/tmp/.ICE-unix/1526,unix/liulu:/tmp/.ICE-unix/1526</value>
     <value type="QString">SHELL=/bin/bash</value>
-    <value type="QString">SSH_AGENT_PID=1579</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-577yqx/ssh</value>
+    <value type="QString">SSH_AGENT_PID=1617</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-yZW3yY/ssh</value>
     <value type="QString">UBUNTU_MENUPROXY=libappmenu.so</value>
     <value type="QString">USER=liulu</value>
     <value type="QString">XAUTHORITY=/home/liulu/.Xauthority</value>
@@ -369,7 +369,7 @@
     <value type="QString">XDG_CURRENT_DESKTOP=GNOME</value>
     <value type="QString">XDG_DATA_DIRS=/usr/share/gnome-shell:/usr/share/gnome:/usr/local/share/:/usr/share/</value>
     <value type="QString">XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0</value>
-    <value type="QString">XDG_SESSION_COOKIE=55bc1cecd29849efab862e4700000005-1450053655.306174-1290307775</value>
+    <value type="QString">XDG_SESSION_COOKIE=55bc1cecd29849efab862e4700000005-1450772051.697541-2100646425</value>
     <value type="QString">XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0</value>
     <value type="QString">XMODIFIERS=@im=ibus</value>
    </valuelist>
