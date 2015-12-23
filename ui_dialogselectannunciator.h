@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading ui file 'dialogselectannunciator.ui'
 **
-** Created: Tue Dec 22 19:30:03 2015
+** Created: Wed Dec 23 19:40:31 2015
 **      by: Qt User Interface Compiler version 4.5.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -35,11 +35,17 @@ public:
 "	border-width:1px;\n"
 "	border-style:solid;\n"
 "	border-color: rgb(9,183,198);\n"
-"	background-color: rgb(89, 64, 64);\n"
 "}\n"
 "QLabel{\n"
-"	background-color: rgb(254, 255, 185);\n"
-"}"));
+"	color:rgb(255, 255, 255);\n"
+"	background-color: rgb(95, 95, 95);\n"
+"}\n"
+"\n"
+"QLabel::focus{\n"
+"	color:rgb(60, 60, 60);\n"
+"	background-color: rgb(208, 230, 255);\n"
+"}\n"
+""));
         label = new QLabel(DialogSelectAnnunciator);
         label->setObjectName(QString::fromUtf8("label"));
         label->setGeometry(QRect(0, 0, 480, 272));

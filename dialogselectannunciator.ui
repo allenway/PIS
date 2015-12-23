@@ -19,11 +19,17 @@
 	border-width:1px;
 	border-style:solid;
 	border-color: rgb(9,183,198);
-	background-color: rgb(89, 64, 64);
 }
 QLabel{
-	background-color: rgb(254, 255, 185);
-}</string>
+	color:rgb(255, 255, 255);
+	background-color: rgb(95, 95, 95);
+}
+
+QLabel::focus{
+	color:rgb(60, 60, 60);
+	background-color: rgb(208, 230, 255);
+}
+</string>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">

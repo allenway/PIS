@@ -79,7 +79,16 @@ void Message::setStation(uchar f,uchar l,uchar c,uchar n)
 {
     dataHandle->setStation(f,l,c,n);
 }
-
+//开启/关闭播放背景音
+void Message::setAudioStat(bool on)
+{
+    dataHandle->setAudioStat(on);
+}
+//开启/关闭播放紧急广播
+void Message::setBroadcastStat(bool on,uchar code)
+{
+    dataHandle->setBroadcastStat(on,code);
+}
 //UartHanle
 UartHandle::UartHandle()
 {
@@ -421,7 +430,7 @@ void DataHandle::updateTrainStat()
     }
     d = dataDCP.at(7);
     //检查司机对讲状态的变化
-    if( d&0x3 != ccStat&0x3 )
+    if( (d&0x3) != (ccStat&0x3) )
     {
         ccStat = d&0x3;
         //发出状态变化信号
@@ -553,7 +562,7 @@ void DataHandle::ptt(bool push)
 //启动
 void DataHandle::startDCP()
 {
-     sendData();
+     //sendData();
 }
 //口播，司机对整列车进行讲话广播
 void DataHandle::pa()
@@ -678,6 +687,28 @@ void DataHandle::setStation(uchar f,uchar l,uchar c,uchar n)
     //qDebug("f=%d l=%d c=%d n=%d\n",f,l,c,n);
     sendData();
 }
+//开启/关闭播放背景音
+void DataHandle::setAudioStat(bool on)
+{
+
+}
+//开启/关闭播放紧急广播
+void DataHandle::setBroadcastStat(bool on,uchar code)
+{
+    if(on)
+    {
+        broadcastStat |= 0x4;
+        broadcastCode = code;
+    }
+    else
+    {
+        broadcastStat &= ~(0x4);
+        broadcastCode = 0;
+    }
+    sendData();
+}
+
+
 
 //ResData
 ResData::ResData()

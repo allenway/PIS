@@ -1,15 +1,15 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'dialogselectannunciator.h'
+** Meta object code from reading C++ file 'mplayerprocess.h'
 **
-** Created: Wed Dec 23 19:41:29 2015
+** Created: Wed Dec 23 19:51:53 2015
 **      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "dialogselectannunciator.h"
+#include "mplayerprocess.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'dialogselectannunciator.h' doesn't include <QObject>."
+#error "The header file 'mplayerprocess.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 61
 #error "This file was generated using the moc from 4.5.0. It"
 #error "cannot be used with the include files from this version of Qt."
@@ -17,7 +17,7 @@
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
-static const uint qt_meta_data_DialogSelectAnnunciator[] = {
+static const uint qt_meta_data_MplayerProcess[] = {
 
  // content:
        2,       // revision
@@ -29,41 +29,41 @@ static const uint qt_meta_data_DialogSelectAnnunciator[] = {
        0,    0, // constructors
 
  // slots: signature, parameters, type, tag, flags
-      25,   24,   24,   24, 0x08,
+      16,   15,   15,   15, 0x08,
 
        0        // eod
 };
 
-static const char qt_meta_stringdata_DialogSelectAnnunciator[] = {
-    "DialogSelectAnnunciator\0\0timeout()\0"
+static const char qt_meta_stringdata_MplayerProcess[] = {
+    "MplayerProcess\0\0playFinish()\0"
 };
 
-const QMetaObject DialogSelectAnnunciator::staticMetaObject = {
-    { &QDialog::staticMetaObject, qt_meta_stringdata_DialogSelectAnnunciator,
-      qt_meta_data_DialogSelectAnnunciator, 0 }
+const QMetaObject MplayerProcess::staticMetaObject = {
+    { &QObject::staticMetaObject, qt_meta_stringdata_MplayerProcess,
+      qt_meta_data_MplayerProcess, 0 }
 };
 
-const QMetaObject *DialogSelectAnnunciator::metaObject() const
+const QMetaObject *MplayerProcess::metaObject() const
 {
     return &staticMetaObject;
 }
 
-void *DialogSelectAnnunciator::qt_metacast(const char *_clname)
+void *MplayerProcess::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_DialogSelectAnnunciator))
-        return static_cast<void*>(const_cast< DialogSelectAnnunciator*>(this));
-    return QDialog::qt_metacast(_clname);
+    if (!strcmp(_clname, qt_meta_stringdata_MplayerProcess))
+        return static_cast<void*>(const_cast< MplayerProcess*>(this));
+    return QObject::qt_metacast(_clname);
 }
 
-int DialogSelectAnnunciator::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int MplayerProcess::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QDialog::qt_metacall(_c, _id, _a);
+    _id = QObject::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: timeout(); break;
+        case 0: playFinish(); break;
         default: ;
         }
         _id -= 1;

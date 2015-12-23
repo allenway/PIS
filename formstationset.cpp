@@ -1,6 +1,7 @@
 #include "formstationset.h"
 #include "ui_formstationset.h"
 #include "rha.h"
+#include "mplayerprocess.h"
 #include <QListWidgetItem>
 #include <QListWidget>
 #include <QSettings>
@@ -227,12 +228,21 @@ bool FormStationSet::eventFilter(QObject *obj, QEvent *e)
 
 void FormStationSet::on_pushButtonStartBro_clicked()
 {
-    qDebug("Start Broadcast");
+    QTableWidgetItem *ti;
+    for(int i = 0;i<ui->tableWidgetBroadcast->rowCount();i++)
+    {
+        ti = ui->tableWidgetBroadcast->item(i,0);
+        if(ti->checkState()==Qt::Checked)
+        {
+            MplayerProcess::playBroadcast(ti->text());
+            return;
+        }
+    }
 }
 
 void FormStationSet::on_pushButtonStopBro_clicked()
 {
-    qDebug("Stop Broadcast");
+    MplayerProcess::stopBroadcast();
 }
 
 void FormStationSet::on_checkBoxReverse_clicked()

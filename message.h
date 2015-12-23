@@ -55,13 +55,15 @@ public:
     bool enable(UartHandle *handle);
     void startDCP();   //启动?
     void pa();      //口播，司机对整列车进行讲话广播
-    void pc();      //紧急对讲应答，司机对报警进行应答？
+    void pc();      //紧急对讲应答，司机对报警进行应答
     void cc();      //司机与司机之间进行对讲
     void sp();      //音量调节
     void mo();      //监听
     void ptt(bool push);     //push to talk，按下时讲话，松开时听话
     //设置起始站 设置终点站 设置当前站 设置下一站
     void setStation(uchar f,uchar l,uchar c,uchar n);
+    void setAudioStat(bool on); //开启/关闭播放背景音
+    void setBroadcastStat(bool on,uchar code);  //开启/关闭播放紧急广播
 
 signals:
     //void ccStatChanged();               //司机对讲状态发送变化
@@ -123,6 +125,8 @@ public:
     void ptt(bool push);     //push to talk，按下时讲话，松开时听话
     //设置起始站 设置终点站 设置当前站 设置下一站
     void setStation(uchar f,uchar l,uchar c,uchar n);
+    void setAudioStat(bool on); //开启/关闭播放背景音
+    void setBroadcastStat(bool on,uchar code = 0);  //开启/关闭播放紧急广播
 
 signals:
     //void ccStatChanged();               //司机对讲状态发送变化

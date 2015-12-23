@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "formstationset.h"
+#include "mplayerprocess.h"
 #include "rha.h"
 #include <QSettings>
 #include <QtDebug>
@@ -15,6 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowFlags(Qt::FramelessWindowHint);//去掉标题栏
     //添加消息处理中心
     msgHandle = new Message();
+    //背景音已经紧急广播由MplayerProcess产生,故需要由MplayerProcess控制紧急广播和背景音的消息发送
+    MplayerProcess::setMsgHandle(msgHandle);
     //加载站台地图
     timerFlash = new QTimer(this);
     loadMap();
@@ -22,7 +25,6 @@ MainWindow::MainWindow(QWidget *parent) :
     menu = new FormMenu(this);
     menu->move(0,0);
     menu->hide();
-
 
     connect(menu,SIGNAL(stationChanged()),this,SLOT(stationUpdate()));
     connect(timerFlash,SIGNAL(timeout()),this,SLOT(flashShowStation()));

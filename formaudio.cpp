@@ -1,6 +1,7 @@
 #include "formaudio.h"
 #include "ui_formaudio.h"
 #include "rha.h"
+#include "mplayerprocess.h"
 #include <QDebug>
 FormAudio::FormAudio(QWidget *parent) :
     QWidget(parent),
@@ -86,42 +87,26 @@ void FormAudio::loadMusicFile()
 
 void FormAudio::on_pushButtonPlay_clicked()
 {
-
     QString path;
-    QString cmd;
-    path = MUSIC_DIR;
-    path += "/";
-    path +=ui->listWidget->currentItem()->text();
-    if(!QFile::exists(path))
+    QStringList list;
+    int i_s,i_c,i_e;
+    i_s = ui->listWidget->currentRow();
+    i_c = ui->listWidget->count();
+    i_e = i_s + i_c;
+    for(int i = i_s;i<i_e;i++)
     {
-        ui->listWidget->removeItemWidget(ui->listWidget->currentItem());
-        return;
+        path = MUSIC_DIR;
+        path += "/";
+        path +=ui->listWidget->item(i%i_c)->text();
+        list.append(path);
     }
-
-    if(mplayerProcess->pid()!=0)
-    {
-        cmd  = "load " +  path + "\n";
-        mplayerProcess->write(cmd.toUtf8());
-    }
-    else
-    {
-        //启动mplayer程序
-        //-ao alsa 采用alsa声卡驱动
-        //-srate 44100 指定输出采样率为44100，否则有写音乐播放出现稀奇古怪的声音
-        //-slave 指定为从机模式
-        //-quiet 指定信息输出模式为quiet
-        cmd = "mplayer -ao alsa -srate 44100 -slave -quiet " + path;
-        //使用arguments参数时，无法启动，故将参数与命令写成一行
-        mplayerProcess->start(cmd);
-        mplayerProcess->waitForStarted(50);
-    }
+    MplayerProcess::playAudio(list);
 }
 
 void FormAudio::on_pushButtonStop_clicked()
 {
     //退出mplayer程序
-    mplayerProcess->write("quit\n");
-    mplayerProcess->waitForFinished(50);
+    MplayerProcess::stopAudio();
 }
 
 void FormAudio::on_pushButtonPrev_clicked()
